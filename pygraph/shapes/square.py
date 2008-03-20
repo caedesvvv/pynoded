@@ -19,8 +19,7 @@ class Square(GraphObject):
         ctx.set_line_width(linewidth)
         ctx.rectangle(self.x,self.y,self.w,self.h)
         ctx.set_source_rgb( 1, 1, 1) 
-        ctx.fill( )
-        ctx.stroke()
+        ctx.fill_preserve( )
         ctx.set_source_rgb( 0, 0, 0) 
-        ctx.rectangle(self.x,self.y,self.w,self.h)
         ctx.stroke()
+
