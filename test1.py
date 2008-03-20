@@ -9,8 +9,6 @@ import gtk
 class GraphObject(object):
     def __init__(self):
         pass
-    def Test(self,x,y):
-        pass
     def Move(self,x,y):
         pass
     def Test(self,x,y):
