@@ -12,10 +12,10 @@ class Square(object):
         self.w = w
         self.h = h
         self.col = col
-    def Draw(self,ctx):
+    def Draw(self,ctx,size):
         print "draw square"
         ctx.set_source_rgb(*self.col)
-        ctx.set_line_width(6)
+        ctx.set_line_width(2./size)
         ctx.rectangle(self.x,self.y,self.w,self.h)
         ctx.stroke()
 
@@ -35,42 +35,56 @@ class GtkBackend(gtk.DrawingArea):
         self.connect('scroll_event', self.scroll_event)
         self.objects = []
         self.scale = (1.0,1.0)
-        self.press_cbs = [self.Create,self.StartScale]
-        self.release_cbs = [None,None]
+        self.press_cbs = [self.Create,None,self.StartMove]
+        self.release_cbs = [None,None,self.EndMove]
+        self.pos = (0.0,0.0)
     def key_event(self, widget, ev):
         print "key event"
-    def Create(self,x,y):
-        print "create"
-        self.objects.append(Square(x-5,y-5,10,10))
-        return True
-    def StartScale(self,x,y):
-        self.scale_start = (x,y)
-        self.connect('motion_notify_event', self.ScaleChange)
-    def ScaleChange(self, widget, ev):
-        scale_x = ev.x
-        scale_y = ev.y
-    def EndScale(self,x,y):
-        pass
-    def scroll_event(self, widget, ev):
-        print "scroll event",ev.x,ev.y,dir(ev),ev.direction
-        if ev.direction == gtk.gdk.SCROLL_DOWN:
-            factor = -0.01
-        else:
-            factor = 0.01
-        self.scale = map(lambda s: s+factor,self.scale)
+    def StartMove(self,x,y):
+        self.movepos = [x,y]
+        self.connect('motion_notify_event', self.move_screen)
+    def EndMove(self,x,y):
+        self.disconnect_by_func(self.move_screen)
+    def move_screen(self,widget,ev):
+        newpos = self.Screen2Surface(ev.x,ev.y)
+        x = newpos[0]-self.movepos[0]
+        y = newpos[1]-self.movepos[1]
+        self.pos = [self.pos[0]+x,self.pos[1]+y]
+        self.movepos = self.Screen2Surface(ev.x,ev.y)
         self.queue_draw_area(0,0,1000,1000)
+    def Create(self,x,y):
+        obj_size = 10/self.scale[0]
+        self.objects.append(Square(x-(obj_size/2),y-(obj_size/2),obj_size,obj_size))
+        return True
+    def Redraw(self):
+        self.queue_draw_area(0,0,1000,1000)
+    def Screen2Surface(self,x,y):
+        x = float(x)
+        y = float(y)
+        return [(x/self.scale[0])-self.pos[0],(y/self.scale[1])-self.pos[1]]
+    def scroll_event(self, widget, ev):
+        pre_pos = self.Screen2Surface(ev.x,ev.y)
+        if ev.direction == gtk.gdk.SCROLL_DOWN:
+            factor = 0.99
+        else:
+            factor = 1.01
+        self.scale = map(lambda s: s*factor,self.scale)
+        post_pos = self.Screen2Surface(ev.x,ev.y)
+        self.pos = map(lambda i: self.pos[i]+post_pos[i]-pre_pos[i],range(2))
+        self.Redraw()
     def button_press_event(self, widget, ev):
-        print "button press event",ev.x,ev.y,ev.button
-        x = (ev.x)/self.scale[0]
-        y = (ev.y)/self.scale[1]
+        x,y = self.Screen2Surface(ev.x,ev.y)
         callback = self.press_cbs[ev.button-1]
         if callback and callback(x,y):
-            self.queue_draw_area(0,0,1000,1000)
+            self.Redraw()
     def button_release_event(self, widget, ev):
         print "button release event",ev.x,ev.y,ev.button
-
+        x,y = self.Screen2Surface(ev.x,ev.y)
+        callback = self.release_cbs[ev.button-1]
+        if callback and callback(x,y):
+            self.Redraw()
     def motion_event(self, widget, ev):
-        print "motion event",ev.x,ev.y
+        pass
     def expose_event(self, widget, event):
         _, _, width, height = widget.allocation
 
@@ -87,13 +101,13 @@ class GtkBackend(gtk.DrawingArea):
         ctx.set_operator (cairo.OPERATOR_SOURCE)
         ctx.paint()
 
-        #ctx.translate ((width - size) / 2, (height - size) / 2)
         ctx.scale(*self.scale)
+        ctx.translate (*self.pos)
 
         #ctx.translate ((width - size) / 2, (height - size) / 2)
         #ctx.scale(size / 150.0, size / 160.0)
         for obj in self.objects:
-            obj.Draw(ctx)
+            obj.Draw(ctx,self.scale[1])
 
         # draw on window
         gc = gtk.gdk.GC(widget.window)
