@@ -26,20 +26,21 @@ class Arrow(object):
         self.y1=y1
         self.color=color
 	def Draw(self,ctx):
-            ctx.set_line_width(1)
-            ctx.set_source_rgb(*self.color)
-            ctx.move_to(self.x0,self.y0)
-            ctx.line_to(self.x1,self.y1)
-            angle=atan2((self.y1-self.y0),(self.x1-self.x0))
-            ctx.rotate(angle)
-            ctx.rel_line_to(-6,0)
-            ctx.rel_line_to(0,3)
-            ctx.rel_line_to(6,-3)
-            ctx.rel_line_to(-6,-3)
-            ctx.rel_line_to(0,3)
-            ctx.fill_preserve()
-            ctx.stroke()
-            
+        ctx.set_line_width(1)
+        linewidth,_ = ctx.device_to_user_distance(1.,1.)
+        ctx.set_line_width(linewidth)
+        ctx.set_source_rgb(*self.color)
+        ctx.move_to(self.x0,self.y0)
+        ctx.line_to(self.x1,self.y1)
+        angle=atan2((self.y1-self.y0),(self.x1-self.x0))
+        ctx.rotate(angle)
+        ctx.rel_line_to(-6,0)
+        ctx.rel_line_to(0,3)
+        ctx.rel_line_to(6,-3)
+        ctx.rel_line_to(-6,-3)
+        ctx.rel_line_to(0,3)
+        ctx.fill_preserve()
+        ctx.stroke()
 
 class Square(object):
     def __init__(self,x,y,w,h,col=(0.1,0.1,0.1)):
@@ -49,10 +50,11 @@ class Square(object):
         self.w = w
         self.h = h
         self.col = col
-    def Draw(self,ctx,size):
+    def Draw(self,ctx):
         print "draw square"
         ctx.set_source_rgb(*self.col)
-        ctx.set_line_width(2./size)
+        linewidth,_ = ctx.device_to_user_distance(2.,2.)
+        ctx.set_line_width(linewidth)
         ctx.rectangle(self.x,self.y,self.w,self.h)
         ctx.stroke()
 
@@ -72,9 +74,9 @@ class GtkBackend(gtk.DrawingArea):
         self.connect('scroll_event', self.scroll_event)
         self.objects = []
         self.scale = (1.0,1.0)
-	self.keyp_cbs = {"+" : lambda ev : Zoom(ev.x,ev.y,1/0.99),
+        self.keyp_cbs = {"+" : lambda ev : Zoom(ev.x,ev.y,1/0.99),
                          "-" : lambda ev : Zoom(ev.x,ev.y,0.99)}
-	self.keyr_cbs = {}
+        self.keyr_cbs = {}
         self.mousep_cbs = [self.Create,None,self.StartMove]
         self.mouser_cbs = [None,None,self.EndMove]
         self.pos = (0.0,0.0)
@@ -111,17 +113,17 @@ class GtkBackend(gtk.DrawingArea):
         y = float(y)
         return [(x/self.scale[0])-self.pos[0],(y/self.scale[1])-self.pos[1]]
     def Zoom(self,x,y,factor):
-        pre_pos = self.Screen2Surface(ev.x,ev.y)
+        pre_pos = self.Screen2Surface(x,y)
         self.scale = map(lambda s: s*factor,self.scale)
-        post_pos = self.Screen2Surface(ev.x,ev.y)
+        post_pos = self.Screen2Surface(x,y)
         self.pos = map(lambda i: self.pos[i]+post_pos[i]-pre_pos[i],range(2))
         self.Redraw()
 
     def scroll_event(self, widget, ev):
         if ev.direction == gtk.gdk.SCROLL_DOWN:
-            Zoom(ev.x,ev.y,0.99)
+            self.Zoom(ev.x,ev.y,0.99)
         else:
-            Zoom(ev.x,ev.y,1/0.99)
+            self.Zoom(ev.x,ev.y,1/0.99)
     def button_press_event(self, widget, ev):
         x,y = self.Screen2Surface(ev.x,ev.y)
         callback = self.mousep_cbs[ev.button-1]
@@ -157,7 +159,7 @@ class GtkBackend(gtk.DrawingArea):
         #ctx.translate ((width - size) / 2, (height - size) / 2)
         #ctx.scale(size / 150.0, size / 160.0)
         for obj in self.objects:
-            obj.Draw(ctx,self.scale[1])
+            obj.Draw(ctx)
 
         # draw on window
         gc = gtk.gdk.GC(widget.window)
