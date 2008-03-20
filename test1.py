@@ -95,6 +95,7 @@ win = gtk.Window()
 win.add_events(gtk.gdk.KEY_PRESS_MASK |
              gtk.gdk.POINTER_MOTION_MASK |
              gtk.gdk.BUTTON_PRESS_MASK |
+             gtk.gdk.BUTTON_RELEASE_MASK |
              gtk.gdk.SCROLL_MASK)
 
 win.connect('destroy', gtk.main_quit)
