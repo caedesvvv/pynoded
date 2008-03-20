@@ -62,8 +62,9 @@ class GtkBackend(gtk.DrawingArea,CairoGraph):
 	self.keyp_cbs = {"+" : self.Key_plus,
                          "-" : self.Key_minus}
 	self.keyr_cbs = {}
-        self.mousep_cbs = [self.Create,None,self.StartMove]
-        self.mouser_cbs = [None,None,self.EndMove]
+        self.mousep_cbs = [self.Create,self.Select,self.StartMove]
+        self.mouser_cbs = [None,self.EndSelect,self.EndMove]
+        self.motion_function=None
 
     def key_press_event(self, widget, ev):
         ev.string in self.keyp_cbs and self.keyp_cbs[ev.string]()
@@ -72,10 +73,11 @@ class GtkBackend(gtk.DrawingArea,CairoGraph):
 
     def StartMove(self,x,y):
         self.movepos = [x,y]
-        self.connect('motion_notify_event', self.move_screen)
+        self.motion_function=self.move_screen
 
     def EndMove(self,x,y):
-        self.disconnect_by_func(self.move_screen)
+        self.motion_function=None
+
     def move_screen(self,widget,ev):
         self.movepos = self.MoveCenter(self.movepos[0],
                                         self.movepos[1],ev.x,ev.y)
@@ -107,7 +109,7 @@ class GtkBackend(gtk.DrawingArea,CairoGraph):
             self.Redraw()
 
     def motion_event(self, widget, ev):
-        pass
+        self.motion_function and self.motion_function(widget,ev)
 
     def expose_event(self, widget, event):
         _, _, width, height = widget.allocation
@@ -131,6 +133,19 @@ class GtkBackend(gtk.DrawingArea,CairoGraph):
 
     def Key_minus(self):
         self.Zoom(self.allocation.width/2,self.allocation.height/2,0.99)
+
+    def Select(self,x,y):
+        for o in self.objects:
+            if o.Test(x,y):
+                def mfunct(widget,event):
+                    o.Move(*self.Screen2Surface(event.x,event.y))
+                    widget.queue_draw()
+                self.motion_function=mfunct
+                break
+                
+    def EndSelect(self,x,y):
+        self.motion_function=None
+
 
 def run(Widget,title="test app"):
     window = gtk.Window()
