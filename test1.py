@@ -9,11 +9,9 @@ import gtk
 class GraphObject(object):
     def __init__(self):
         pass
-    def press(self,x,y):
+    def Test(self,x,y):
         pass
-    def release(self,x,y):
-        pass
-    def move(self,x,y):
+    def Move(self,x,y):
         pass
     def Draw(self,ctx,scale):
         pass
@@ -42,7 +40,7 @@ class Arrow(object):
         ctx.fill_preserve()
         ctx.stroke()
 
-class Square(object):
+class Square(GraphObject):
     def __init__(self,x,y,w,h,col=(0.1,0.1,0.1)):
         print "NEW SQUARE"
         self.x = x
@@ -62,6 +60,12 @@ class Square(object):
         ctx.set_source_rgb( 0, 0, 0) 
         ctx.rectangle(self.x,self.y,self.w,self.h)
         ctx.stroke()
+    def Test(self,x,y):
+        return x>=self.x and x<=self.x+self.w and y>=self.y and y<=self.y+self.h
+    def Move(self,x,y):
+        self.x=x
+        self.y=y
+
 
 class CairoGraph(object):
     def __init__(self):
@@ -118,8 +122,9 @@ class GtkBackend(gtk.DrawingArea,CairoGraph):
 	self.keyp_cbs = {"+" : self.Key_plus,
                          "-" : self.Key_minus}
 	self.keyr_cbs = {}
-        self.mousep_cbs = [self.Create,None,self.StartMove]
-        self.mouser_cbs = [None,None,self.EndMove]
+        self.mousep_cbs = [self.Create,self.Select,self.StartMove]
+        self.mouser_cbs = [None,self.EndSelect,self.EndMove]
+        self.motion_function=None
 
     def key_press_event(self, widget, ev):
         ev.string in self.keyp_cbs and self.keyp_cbs[ev.string]()
@@ -128,16 +133,17 @@ class GtkBackend(gtk.DrawingArea,CairoGraph):
 
     def StartMove(self,x,y):
         self.movepos = [x,y]
-        self.connect('motion_notify_event', self.move_screen)
+        self.motion_function=self.move_screen
 
     def EndMove(self,x,y):
-        self.disconnect_by_func(self.move_screen)
+        self.motion_function=None
+
     def move_screen(self,widget,ev):
         self.movepos = self.MoveCenter(self.movepos[0],
                                         self.movepos[1],ev.x,ev.y)
         self.Redraw()
     def Redraw(self):
-        self.queue_draw_area(0,0,1000,1000)
+        self.queue_draw()
 
     def Zoom(self,x,y,factor):
         CairoGraph.Zoom(self,x,y,factor)
@@ -163,7 +169,7 @@ class GtkBackend(gtk.DrawingArea,CairoGraph):
             self.Redraw()
 
     def motion_event(self, widget, ev):
-        pass
+        self.motion_function and self.motion_function(widget,ev)
 
     def expose_event(self, widget, event):
         _, _, width, height = widget.allocation
@@ -187,6 +193,19 @@ class GtkBackend(gtk.DrawingArea,CairoGraph):
 
     def Key_minus(self):
         self.Zoom(self.allocation.width/2,self.allocation.height/2,0.99)
+
+    def Select(self,x,y):
+        for o in self.objects:
+            if o.Test(x,y):
+                def mfunct(widget,event):
+                    o.Move(*self.Screen2Surface(event.x,event.y))
+                    widget.queue_draw()
+                self.motion_function=mfunct
+                break
+                
+    def EndSelect(self,x,y):
+        self.motion_function=None
+
 
 def run(Widget,title="test app"):
     window = gtk.Window()
