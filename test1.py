@@ -89,6 +89,12 @@ class CairoGraph(object):
         self.scale = map(lambda s: s*factor,self.scale)
         post_pos = self.Screen2Surface(x,y)
         self.pos = map(lambda i: self.pos[i]+post_pos[i]-pre_pos[i],range(2))
+    def MoveCenter(from_x,from_y,to_x,to_y):
+        newpos = self.Screen2Surface(to_x,to_x)
+        x = newpos[0]-from_x
+        y = newpos[1]-from_y
+        self.pos = [self.pos[0]+x,self.pos[1]+y]
+        self.movepos = self.Screen2Surface(to_x,to_x)
 
 class GtkBackend(gtk.DrawingArea,CairoGraph):
     def __init__(self):
@@ -124,15 +130,10 @@ class GtkBackend(gtk.DrawingArea,CairoGraph):
 
     def EndMove(self,x,y):
         self.disconnect_by_func(self.move_screen)
-
     def move_screen(self,widget,ev):
-        newpos = self.Screen2Surface(ev.x,ev.y)
-        x = newpos[0]-self.movepos[0]
-        y = newpos[1]-self.movepos[1]
-        self.pos = [self.pos[0]+x,self.pos[1]+y]
-        self.movepos = self.Screen2Surface(ev.x,ev.y)
-        self.queue_draw_area(0,0,1000,1000)
-
+        self.movepos = self.MoveCenter(self.movepos[0],
+                                        self.movepos[1],ev.x,ev.y)
+        self.Redraw()
     def Redraw(self):
         self.queue_draw_area(0,0,1000,1000)
 
