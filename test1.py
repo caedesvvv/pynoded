@@ -6,69 +6,7 @@ from math import pi,atan2
 import cairo
 import gtk
 
-class GraphObject(object):
-    def __init__(self):
-        pass
-    def press(self,x,y):
-        pass
-    def release(self,x,y):
-        pass
-    def move(self,x,y):
-        pass
-    def Test(self,x,y):
-        pass
-    def Draw(self,ctx):
-        pass
-
-class Arrow(GraphObject):
-    def __init__(self,color,x0,y0,x1,y1):
-        GraphObject.__init__(self)
-        self.x0=x0
-        self.x1=x1
-        self.y0=y0
-        self.y1=y1
-        self.color=color
-    def Draw(self,ctx):
-        ctx.set_line_width(1)
-        linewidth,_ = ctx.device_to_user_distance(1.,1.)
-        ctx.set_line_width(linewidth)
-        ctx.set_source_rgb(*self.color)
-        ctx.move_to(self.x0,self.y0)
-        ctx.line_to(self.x1,self.y1)
-        angle=atan2((self.y1-self.y0),(self.x1-self.x0))
-        ctx.rotate(angle)
-        ctx.rel_line_to(-6,0)
-        ctx.rel_line_to(0,3)
-        ctx.rel_line_to(6,-3)
-        ctx.rel_line_to(-6,-3)
-        ctx.rel_line_to(0,3)
-        ctx.fill_preserve()
-        ctx.stroke()
-
-class Square(GraphObject):
-    def __init__(self,x,y,w,h,col=(0.1,0.1,0.1)):
-        GraphObject.__init__(self)
-        self.x = x
-        self.y = y
-        self.w = w
-        self.h = h
-        self.col = col
-    def Draw(self,ctx):
-        print "draw square"
-        ctx.set_source_rgb(*self.col)
-        linewidth,_ = ctx.device_to_user_distance(2.,2.)
-        ctx.set_line_width(linewidth)
-        ctx.rectangle(self.x,self.y,self.w,self.h)
-        ctx.set_source_rgb( 1, 1, 1) 
-        ctx.fill( )
-        ctx.stroke()
-        ctx.set_source_rgb( 0, 0, 0) 
-        ctx.rectangle(self.x,self.y,self.w,self.h)
-        ctx.stroke()
-
-class GraphNode(Square):
-    def __init__(self,x,y,w,h):
-        Square.__init__(self,x,y,w,h)
+from pygraph.shapes import GraphNode
 
 class CairoGraph(object):
     def __init__(self):
@@ -76,8 +14,8 @@ class CairoGraph(object):
         self.scale = (1.0,1.0)
         self.pos = (0.0,0.0)
     def Create(self,x,y):
-        obj_size = 10/self.scale[0]
-        self.objects.append(Square(x-(obj_size/2),y-(obj_size/2),obj_size,obj_size))
+        obj_size = 30/self.scale[0]
+        self.objects.append(GraphNode(x-(obj_size/2),y-(obj_size/2),obj_size,obj_size))
         return True
     def Screen2Surface(self,x,y):
         x = float(x)
@@ -94,7 +32,6 @@ class CairoGraph(object):
         # draw all CairoObjects
         for obj in self.objects:
             obj.Draw(ctx)
-
     def Zoom(self,x,y,factor):
         pre_pos = self.Screen2Surface(x,y)
         self.scale = map(lambda s: s*factor,self.scale)
@@ -144,7 +81,7 @@ class GtkBackend(gtk.DrawingArea,CairoGraph):
                                         self.movepos[1],ev.x,ev.y)
         self.Redraw()
     def Redraw(self):
-        self.queue_draw_area(0,0,1000,1000)
+        self.queue_draw()
 
     def Zoom(self,x,y,factor):
         CairoGraph.Zoom(self,x,y,factor)
