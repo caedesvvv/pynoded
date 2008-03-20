@@ -105,28 +105,26 @@ class GtkBackend(gtk.DrawingArea,CairoGraph):
         super(GtkBackend,self).__init__()
         CairoGraph.__init__(self)
         self.add_events(gtk.gdk.KEY_PRESS_MASK |
+                        gtk.gdk.KEY_RELEASE_MASK |
                         gtk.gdk.POINTER_MOTION_MASK |
                         gtk.gdk.BUTTON_PRESS_MASK |
                         gtk.gdk.BUTTON_RELEASE_MASK |
                         gtk.gdk.SCROLL_MASK)
-        self.connect('key_press_event', self.key_press_event)
         self.connect('button_press_event', self.button_press_event)
         self.connect('button_release_event', self.button_release_event)
         self.connect('motion_notify_event', self.motion_event)
         self.connect('expose_event', self.expose_event)
         self.connect('scroll_event', self.scroll_event)
-        self.keyp_cbs = {"+" : lambda ev : Zoom(ev.x,ev.y,1/0.99),
-                         "-" : lambda ev : Zoom(ev.x,ev.y,0.99)}
-        self.keyr_cbs = {}
+	self.keyp_cbs = {"+" : self.Key_plus,
+                         "-" : self.Key_minus}
+	self.keyr_cbs = {}
         self.mousep_cbs = [self.Create,None,self.StartMove]
         self.mouser_cbs = [None,None,self.EndMove]
 
     def key_press_event(self, widget, ev):
-        print "KEY EVENT"
-        keyp_cbs[ev.string](ev.x,ev.y)
-
+        ev.string in self.keyp_cbs and self.keyp_cbs[ev.string]()
     def key_release_event(self,widget, ev):
-        keyr_cbs[ev.string](ev.x,ev.y)
+        ev.string in self.keyr_cbs and self.keyr_cbs[ev.string]()
 
     def StartMove(self,x,y):
         self.movepos = [x,y]
@@ -152,6 +150,7 @@ class GtkBackend(gtk.DrawingArea,CairoGraph):
             self.Zoom(ev.x,ev.y,1/0.99)
 
     def button_press_event(self, widget, ev):
+        print "BPE"
         x,y = self.Screen2Surface(ev.x,ev.y)
         callback = self.mousep_cbs[ev.button-1]
         if callback and callback(x,y):
@@ -183,11 +182,20 @@ class GtkBackend(gtk.DrawingArea,CairoGraph):
         gc = gtk.gdk.GC(widget.window)
         widget.window.draw_drawable(gc, pixmap, 0,0, 0,0, -1,-1)
 
+    def Key_plus(self):
+        self.Zoom(self.allocation.width/2,self.allocation.height/2,1/0.99)
+
+    def Key_minus(self):
+        self.Zoom(self.allocation.width/2,self.allocation.height/2,0.99)
+
 def run(Widget,title="test app"):
     window = gtk.Window()
     window.set_title(title)
     window.connect("delete-event", gtk.main_quit)
     widget = Widget()
+    window.connect('key_press_event', widget.key_press_event)
+    window.connect('key_release_event', widget.key_release_event)
+     
     widget.show()
     window.add(widget)
     window.present()
