@@ -60,11 +60,11 @@ class GtkBackend(gtk.DrawingArea):
     def __init__(self):
         super(GtkBackend,self).__init__()
         self.add_events(gtk.gdk.KEY_PRESS_MASK |
+                        gtk.gdk.KEY_RELEASE_MASK |
                         gtk.gdk.POINTER_MOTION_MASK |
                         gtk.gdk.BUTTON_PRESS_MASK |
                         gtk.gdk.BUTTON_RELEASE_MASK |
                         gtk.gdk.SCROLL_MASK)
-        self.connect('key_press_event', self.key_press_event)
         self.connect('button_press_event', self.button_press_event)
         self.connect('button_release_event', self.button_release_event)
         self.connect('motion_notify_event', self.motion_event)
@@ -72,19 +72,17 @@ class GtkBackend(gtk.DrawingArea):
         self.connect('scroll_event', self.scroll_event)
         self.objects = []
         self.scale = (1.0,1.0)
-	self.keyp_cbs = {"+" : lambda ev : Zoom(ev.x,ev.y,1/0.99),
-                         "-" : lambda ev : Zoom(ev.x,ev.y,0.99)}
+	self.keyp_cbs = {"+" : self.Key_plus,
+                         "-" : self.Key_minus}
 	self.keyr_cbs = {}
         self.mousep_cbs = [self.Create,None,self.StartMove]
         self.mouser_cbs = [None,None,self.EndMove]
         self.pos = (0.0,0.0)
 
     def key_press_event(self, widget, ev):
-        print "KEY EVENT"
-        keyp_cbs[ev.string](ev.x,ev.y)
-
+        ev.string in self.keyp_cbs and self.keyp_cbs[ev.string]()
     def key_release_event(self,widget, ev):
-        keyr_cbs[ev.string](ev.x,ev.y)
+        ev.string in self.keyr_cbs and self.keyr_cbs[ev.string]()
 
     def StartMove(self,x,y):
         self.movepos = [x,y]
@@ -106,14 +104,15 @@ class GtkBackend(gtk.DrawingArea):
         return True
     def Redraw(self):
         self.queue_draw_area(0,0,1000,1000)
+
     def Screen2Surface(self,x,y):
         x = float(x)
         y = float(y)
         return [(x/self.scale[0])-self.pos[0],(y/self.scale[1])-self.pos[1]]
     def Zoom(self,x,y,factor):
-        pre_pos = self.Screen2Surface(ev.x,ev.y)
+        pre_pos = self.Screen2Surface(x,y)
         self.scale = map(lambda s: s*factor,self.scale)
-        post_pos = self.Screen2Surface(ev.x,ev.y)
+        post_pos = self.Screen2Surface(x,y)
         self.pos = map(lambda i: self.pos[i]+post_pos[i]-pre_pos[i],range(2))
         self.Redraw()
 
@@ -123,6 +122,7 @@ class GtkBackend(gtk.DrawingArea):
         else:
             Zoom(ev.x,ev.y,1/0.99)
     def button_press_event(self, widget, ev):
+        print "BPE"
         x,y = self.Screen2Surface(ev.x,ev.y)
         callback = self.mousep_cbs[ev.button-1]
         if callback and callback(x,y):
@@ -162,12 +162,22 @@ class GtkBackend(gtk.DrawingArea):
         # draw on window
         gc = gtk.gdk.GC(widget.window)
         widget.window.draw_drawable(gc, pixmap, 0,0, 0,0, -1,-1)
+
+    def Key_plus(self):
+        self.Zoom(self.allocation.width/2,self.allocation.height/2,1/0.99)
+
+    def Key_minus(self):
+        self.Zoom(self.allocation.width/2,self.allocation.height/2,0.99)
+
         
 def run(Widget,title="test app"):
     window = gtk.Window()
     window.set_title(title)
     window.connect("delete-event", gtk.main_quit)
     widget = Widget()
+    window.connect('key_press_event', widget.key_press_event)
+    window.connect('key_release_event', widget.key_release_event)
+     
     widget.show()
     window.add(widget)
     window.present()
