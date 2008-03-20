@@ -13,11 +13,14 @@ class GraphObject(object):
         pass
     def Move(self,x,y):
         pass
-    def Draw(self,ctx,scale):
+    def Test(self,x,y):
+        pass
+    def Draw(self,ctx):
         pass
 
-class Arrow(object):
+class Arrow(GraphObject):
     def __init__(self,color,x0,y0,x1,y1):
+        GraphObject.__init__(self)
         self.x0=x0
         self.x1=x1
         self.y0=y0
@@ -42,7 +45,7 @@ class Arrow(object):
 
 class Square(GraphObject):
     def __init__(self,x,y,w,h,col=(0.1,0.1,0.1)):
-        print "NEW SQUARE"
+        GraphObject.__init__(self)
         self.x = x
         self.y = y
         self.w = w
@@ -66,6 +69,10 @@ class Square(GraphObject):
         self.x=x
         self.y=y
 
+
+class GraphNode(Square):
+    def __init__(self,x,y,w,h):
+        Square.__init__(self,x,y,w,h)
 
 class CairoGraph(object):
     def __init__(self):
