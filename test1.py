@@ -56,6 +56,11 @@ class Square(object):
         linewidth,_ = ctx.device_to_user_distance(2.,2.)
         ctx.set_line_width(linewidth)
         ctx.rectangle(self.x,self.y,self.w,self.h)
+        ctx.set_source_rgb( 1, 1, 1) 
+        ctx.fill( )
+        ctx.stroke()
+        ctx.set_source_rgb( 0, 0, 0) 
+        ctx.rectangle(self.x,self.y,self.w,self.h)
         ctx.stroke()
 
 class CairoGraph(object):
@@ -76,20 +81,19 @@ class CairoGraph(object):
         ctx.set_source_rgb(0.7,0.7,0.7)
         ctx.set_operator (cairo.OPERATOR_SOURCE)
         ctx.paint()
-
+        # apply scale and position
         ctx.scale(*self.scale)
         ctx.translate (*self.pos)
-
-        #ctx.translate ((width - size) / 2, (height - size) / 2)
-        #ctx.scale(size / 150.0, size / 160.0)
+        # draw all CairoObjects
         for obj in self.objects:
             obj.Draw(ctx)
+
     def Zoom(self,x,y,factor):
         pre_pos = self.Screen2Surface(x,y)
         self.scale = map(lambda s: s*factor,self.scale)
         post_pos = self.Screen2Surface(x,y)
         self.pos = map(lambda i: self.pos[i]+post_pos[i]-pre_pos[i],range(2))
-    def MoveCenter(from_x,from_y,to_x,to_y):
+    def MoveCenter(self,from_x,from_y,to_x,to_y):
         newpos = self.Screen2Surface(to_x,to_x)
         x = newpos[0]-from_x
         y = newpos[1]-from_y
