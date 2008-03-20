@@ -13,7 +13,6 @@ class Square(GraphObject):
         self.h = h
         self.col = col
     def Draw(self,ctx):
-        print "draw square"
         ctx.set_source_rgb(*self.col)
         linewidth,_ = ctx.device_to_user_distance(2.,2.)
         ctx.set_line_width(linewidth)
