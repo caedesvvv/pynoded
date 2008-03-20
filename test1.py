@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-# -*- coding: iso8859-1 -*-
+# -*- coding: utf-8 -*-
 #
-# Copyright © 2004 Kevin Worth
+# Copyright Â© 2004 Kevin Worth
 #
 # Permission to use, copy, modify, distribute, and sell this software
 # and its documentation for any purpose is hereby granted without fee,
