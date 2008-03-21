@@ -94,8 +94,8 @@ class CairoGraph(object):
         ctx.scale(*self.scale)
         ctx.translate (*self.pos)
         # draw all CairoObjects
-        for obj in self.objects:
-            obj.Draw(ctx)
+        for o in self.objects:
+            o.Draw(ctx)
 
     def Zoom(self,x,y,factor):
         pre_pos = self.Screen2Surface(x,y)
@@ -200,8 +200,11 @@ class GtkBackend(gtk.DrawingArea,CairoGraph):
         self.Zoom(self.allocation.width/2,self.allocation.height/2,0.99)
 
     def Select(self,x,y):
-        for o in self.objects:
+        for i in range(len(self.objects)-1,-1,-1):
+            o=self.objects[i]
             if o.Test(x,y):
+                self.objects.pop(i)
+                self.objects.append(o)
                 def mfunct(widget,event):
                     o.Move(*self.Screen2Surface(event.x,event.y))
                     widget.queue_draw()
