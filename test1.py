@@ -146,7 +146,8 @@ class GtkBackend(gtk.DrawingArea,CairoGraph):
                     widget.queue_draw()
                 self.motion_function=mfunct
                 break
-                
+        return True
+
     def EndSelect(self,x,y):
         self.motion_function=None
 
