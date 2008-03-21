@@ -14,10 +14,9 @@ class Circle(GraphObject):
         self.h = h
         self.col = col
     def Draw(self,ctx):
-        ctx.set_source_rgb(*self.col)
         linewidth,_ = ctx.device_to_user_distance(2.,2.)
         ctx.set_line_width(linewidth)
-        ctx.set_source_rgb( 1, 1, 1)
+        ctx.set_source_rgb(*self.col)
         ctx.arc (self.x, self.y, self.w, 0, 2 * math.pi)
         ctx.fill_preserve()
         ctx.set_source_rgb( 0,0,0)
