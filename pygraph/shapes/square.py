@@ -13,14 +13,17 @@ class Square(GraphObject):
         self.h = h
         self.col = col
     def Draw(self,ctx):
-        print "draw square"
         ctx.set_source_rgb(*self.col)
         linewidth,_ = ctx.device_to_user_distance(2.,2.)
         ctx.set_line_width(linewidth)
         ctx.rectangle(self.x,self.y,self.w,self.h)
         ctx.set_source_rgb( 1, 1, 1) 
-        ctx.fill( )
-        ctx.stroke()
+        ctx.fill_preserve( )
         ctx.set_source_rgb( 0, 0, 0) 
-        ctx.rectangle(self.x,self.y,self.w,self.h)
         ctx.stroke()
+    def Test(self,x,y):
+        return x>=self.x and x<=self.x+self.w and y>=self.y and y<=self.y+self.h
+    def Move(self,x,y):
+        self.x=x
+        self.y=y
+
