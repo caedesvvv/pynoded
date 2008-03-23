@@ -10,8 +10,8 @@ class MainGraph(gtk.DrawingArea,Graph):
         gtk.DrawingArea.__init__(self)
         Graph.__init__(self)
         self.evstack=EvStack()
-        self.evstack.stack.append(PropagateEvH(self))
         self.evstack.stack.append(DefaultEvH(self))
+        self.evstack.stack.append(PropagateEvH(self))
         self.pos=(0,0)
         self.scale=1
         
@@ -40,10 +40,12 @@ class MainGraph(gtk.DrawingArea,Graph):
         self.pos = map(lambda i: self.pos[i]+post_pos[i]-pre_pos[i],range(2))
         self.queue_draw()
  
-    def NewNode(self):
+    def NewNode(self,dest=None):
+        if not dest:
+            dest = self
         x,y=self.GetPointer()
         obj_size = 30/self.scale
-        self.objects.append(GraphNode(self,x-(obj_size/2),y-(obj_size/2),obj_size,obj_size))
+        dest.objects.append(GraphNode(self,x-(obj_size/2),y-(obj_size/2),obj_size,obj_size))
         self.evstack.expose()
 
 

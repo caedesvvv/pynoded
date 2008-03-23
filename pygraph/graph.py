@@ -12,7 +12,6 @@ class GraphObject(EvHandler,Drawable):
 class Graph(GraphObject):
     def __init__(self):
         self.objects=[]
-
     def Draw(self,ctx):
         # draw all CairoObjects
         for obj in self.objects:
@@ -29,3 +28,4 @@ class Graph(GraphObject):
         for o in reversed(self.objects):
             if o.Test(x,y):
                 return o
+

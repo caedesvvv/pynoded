@@ -71,10 +71,15 @@ class GraphNode(Graph):
 
     def Propagate(self,event,*args):
         x,y=self.maingraph.GetPointer()
-        Graph.Propagate(self,x,y,event,*args)
-                         
+        return Graph.Propagate(self,x,y,event,*args)
+
     def mousepress_left(self):
         return self.Propagate("mousepress_left")
     def connect(self,source):
         return self.Propagate("connect",source)
+    def keypress_c(self):
+        if not self.Propagate("keypress_c"):
+            self.maingraph.NewNode(self)
+            return True
+
 
