@@ -23,7 +23,5 @@ class Square(GraphObject):
         ctx.stroke()
     def Test(self,x,y):
         return x>=self.x and x<=self.x+self.w and y>=self.y and y<=self.y+self.h
-    def Move(self,x,y):
-        self.x=x
-        self.y=y
-
+    def mousepress_left(self):
+        return True

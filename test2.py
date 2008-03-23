@@ -14,6 +14,8 @@ def run(Widget,title="test app"):
             evh.keypress_plus()
         elif ev.string=="-":
             evh.keypress_minus()
+        elif ev.string=="c":
+            evh.keypress_c()
     def key_release_event(widget,ev):
         pass
     def button_press_event(widget,ev):

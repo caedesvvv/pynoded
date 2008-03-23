@@ -1,10 +1,11 @@
 from graph import *
 from evhandler import *
+from evhandlers import *
 from shapes import GraphNode
 import gtk
 import cairo
 
-class MainGraph(Graph,gtk.DrawingArea):
+class MainGraph(gtk.DrawingArea,Graph):
     def __init__(self):
         gtk.DrawingArea.__init__(self)
         Graph.__init__(self)
@@ -14,6 +15,8 @@ class MainGraph(Graph,gtk.DrawingArea):
         self.pos=(0,0)
         self.scale=1
         
+    def GetPointer(self):
+        return self.Screen2Surface(*self.get_pointer())
 
     def Draw(self,ctx):
         # set the background
@@ -38,7 +41,7 @@ class MainGraph(Graph,gtk.DrawingArea):
         self.queue_draw()
  
     def NewNode(self):
-        x,y=self.Screen2Surface(*self.get_pointer())
+        x,y=self.GetPointer()
         obj_size = 30/self.scale
         self.objects.append(GraphNode(self,x-(obj_size/2),y-(obj_size/2),obj_size,obj_size))
         self.evstack.expose()
@@ -64,7 +67,7 @@ class DefaultEvH(EvHandler):
         self.maingraph.Zoom(self.maingraph.allocation.width/2,self.maingraph.allocation.height/2,0.99)
         return True
 
-    def mousepress_left(self):
+    def keypress_c(self):
         self.maingraph.NewNode()
         return True
 
@@ -88,15 +91,6 @@ class DefaultEvH(EvHandler):
         self.maingraph.window.draw_drawable(gc, pixmap, 0,0, 0,0, -1,-1)
         return True
 
-class PropagateEvH(EvHandler):
-    def __init__(self,maingraph):
-        self.maingraph=maingraph
-
-    def __getattr__(self,name):
-        x,y=self.maingraph.Screen2Surface(*self.maingraph.get_pointer())
-        o=self.maingraph.ObjectAt(x,y)
-        return lambda *args: o and getattr(o,name,False) and getattr(o,name)(*args)
-
 class ScrollEvH(EvHandler):
     def __init__(self,maingraph,initmx,initmy):
         self.maingraph=maingraph
@@ -115,3 +109,11 @@ class ScrollEvH(EvHandler):
     def mouserelease_right(self):
         self.maingraph.evstack.stack.remove(self)
         return True
+
+class PropagateEvH(EvHandler):
+    def __init__(self,maingraph):
+        self.maingraph=maingraph
+
+    def __getattr__(self,name):
+        x,y=self.maingraph.GetPointer()
+        return lambda *args: self.maingraph.Propagate(x,y,name,*args)
