@@ -47,7 +47,7 @@ class CairoGraph(object):
 
 class GtkBackend(gtk.DrawingArea,CairoGraph):
     def __init__(self):
-        super(GtkBackend,self).__init__()
+        gtk.DrawingArea.__init__(self)
         CairoGraph.__init__(self)
         self.add_events(gtk.gdk.KEY_PRESS_MASK |
                         gtk.gdk.KEY_RELEASE_MASK |
@@ -141,10 +141,11 @@ class GtkBackend(gtk.DrawingArea,CairoGraph):
             if o.Test(x,y):
                 self.objects.pop(i)
                 self.objects.append(o)
-                def mfunct(widget,event):
-                    o.Move(*self.Screen2Surface(event.x,event.y))
-                    widget.queue_draw()
-                self.motion_function=mfunct
+                o.Select(x,y)
+#                 def mfunct(widget,event):
+#                     o.Move(*self.Screen2Surface(event.x,event.y))
+#                     widget.queue_draw()
+#                 self.motion_function=mfunct
                 break
         return True
 

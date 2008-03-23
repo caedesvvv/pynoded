@@ -5,9 +5,7 @@
 class GraphObject(object):
     def __init__(self):
         pass
-    def press(self,x,y):
-        pass
-    def release(self,x,y):
+    def select(self,x,y):
         pass
     def move(self,x,y):
         pass
