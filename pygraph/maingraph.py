@@ -1,12 +1,13 @@
-from gobject import *
+from graph import *
+from evhandler import *
 from shapes import GraphNode
 import gtk
 import cairo
 
-class MainMap(GObjMap,gtk.DrawingArea):
+class MainGraph(Graph,gtk.DrawingArea):
     def __init__(self):
         gtk.DrawingArea.__init__(self)
-        GObjMap.__init__(self)
+        Graph.__init__(self)
         self.evstack=EvStack()
         self.evstack.stack.append(PropagateEvH(self))
         self.evstack.stack.append(DefaultEvH(self))
@@ -22,7 +23,7 @@ class MainMap(GObjMap,gtk.DrawingArea):
         # apply scale and position
         ctx.scale(self.scale,self.scale)
         ctx.translate (*self.pos)
-        GObjMap.Draw(self,ctx)
+        Graph.Draw(self,ctx)
 
     def Screen2Surface(self,x,y):
         x = float(x)
@@ -44,73 +45,73 @@ class MainMap(GObjMap,gtk.DrawingArea):
 
 
 class DefaultEvH(EvHandler):
-    def __init__(self,mainmap):
-        self.mainmap=mainmap
+    def __init__(self,maingraph):
+        self.maingraph=maingraph
 
     def scroll_up(self):
-        x,y=self.mainmap.get_pointer()
-        self.mainmap.Zoom(x,y,1/0.99)
+        x,y=self.maingraph.get_pointer()
+        self.maingraph.Zoom(x,y,1/0.99)
         
     def keypress_plus(self):
-        self.mainmap.Zoom(self.mainmap.allocation.width/2,self.mainmap.allocation.height/2,1/0.99)
+        self.maingraph.Zoom(self.maingraph.allocation.width/2,self.maingraph.allocation.height/2,1/0.99)
         return True
 
     def scroll_down(self):
-        x,y=self.mainmap.get_pointer()
-        self.mainmap.Zoom(x,y,0.99)
+        x,y=self.maingraph.get_pointer()
+        self.maingraph.Zoom(x,y,0.99)
 
     def keypress_minus(self):
-        self.mainmap.Zoom(self.mainmap.allocation.width/2,self.mainmap.allocation.height/2,0.99)
+        self.maingraph.Zoom(self.maingraph.allocation.width/2,self.maingraph.allocation.height/2,0.99)
         return True
 
     def mousepress_left(self):
-        self.mainmap.NewNode()
+        self.maingraph.NewNode()
         return True
 
     def mousepress_right(self):
-        x,y=self.mainmap.get_pointer()
-        self.mainmap.evstack.stack.append(ScrollEvH(self.mainmap,x,y))
+        x,y=self.maingraph.get_pointer()
+        self.maingraph.evstack.stack.append(ScrollEvH(self.maingraph,x,y))
         return True
 
     def mouse_motion(self,x,y):
         return True
 
     def expose(self):
-        _,_,width,height=self.mainmap.allocation
-        pixmap = gtk.gdk.Pixmap (self.mainmap.window, width, height)
+        _,_,width,height=self.maingraph.allocation
+        pixmap = gtk.gdk.Pixmap (self.maingraph.window, width, height)
         ctx = pixmap.cairo_create()
 
-        self.mainmap.Draw(ctx)
+        self.maingraph.Draw(ctx)
 
         # draw on window
-        gc = gtk.gdk.GC(self.mainmap.window)
-        self.mainmap.window.draw_drawable(gc, pixmap, 0,0, 0,0, -1,-1)
+        gc = gtk.gdk.GC(self.maingraph.window)
+        self.maingraph.window.draw_drawable(gc, pixmap, 0,0, 0,0, -1,-1)
         return True
 
 class PropagateEvH(EvHandler):
-    def __init__(self,mainmap):
-        self.mainmap=mainmap
+    def __init__(self,maingraph):
+        self.maingraph=maingraph
 
     def __getattr__(self,name):
-        x,y=self.mainmap.get_pointer()
-        o=self.mainmap.ObjectAt(x,y)
+        x,y=self.maingraph.Screen2Surface(*self.maingraph.get_pointer())
+        o=self.maingraph.ObjectAt(x,y)
         return lambda *args: o and getattr(o,name,False) and getattr(o,name)(*args)
 
 class ScrollEvH(EvHandler):
-    def __init__(self,mainmap,initmx,initmy):
-        self.mainmap=mainmap
-        self.initpos=mainmap.pos
+    def __init__(self,maingraph,initmx,initmy):
+        self.maingraph=maingraph
+        self.initpos=maingraph.pos
         self.initmx=initmx
         self.initmy=initmy
 
     def mouse_motion(self,x,y):
         dx,dy=float(x-self.initmx),float(y-self.initmy)
-        self.mainmap.pos=(self.mainmap.pos[0]+dx/self.mainmap.scale,self.mainmap.pos[1]+dy/self.mainmap.scale)
-        self.initpos=self.mainmap.pos
+        self.maingraph.pos=(self.maingraph.pos[0]+dx/self.maingraph.scale,self.maingraph.pos[1]+dy/self.maingraph.scale)
+        self.initpos=self.maingraph.pos
         self.initmx,self.initmy=x,y
-        self.mainmap.queue_draw()
+        self.maingraph.queue_draw()
         return True
 
     def mouserelease_right(self):
-        self.mainmap.evstack.stack.remove(self)
+        self.maingraph.evstack.stack.remove(self)
         return True

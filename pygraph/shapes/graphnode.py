@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-from pygraph.gobject import *
+from pygraph.graph import *
 from pygraph.shapes import Square,Circle
 import random
 
 colors = [(1,0,0),(0,1,0),(1,1,1),(1,0,1),(0,0,1)]
 
 class GraphNode(Square):
-    def __init__(self,mainmap,x,y,w,h):
+    def __init__(self,maingraph,x,y,w,h):
         Square.__init__(self,x,y,w,h)
-        self.mainmap=mainmap
+        self.maingraph=maingraph
         self.inp_r = h/15.
         self.stride = h/5
         self.inputs = []
@@ -42,20 +42,20 @@ class GraphNode(Square):
             output.Draw(ctx)
         ctx.restore()
     def mousepress_middle(self):
-        self.mainmap.evstack.stack.append(MoveEvH(self.mainmap,self))
-        self.mainmap.objects.remove(self)
-        self.mainmap.objects.append(self)
-        self.mainmap.queue_draw()
+        self.maingraph.evstack.stack.append(MoveEvH(self.maingraph,self))
+        self.maingraph.objects.remove(self)
+        self.maingraph.objects.append(self)
+        self.maingraph.queue_draw()
         return True
 
 class MoveEvH(EvHandler):
-    def __init__(self,mainmap,object):
-        self.mainmap=mainmap
+    def __init__(self,maingraph,object):
+        self.maingraph=maingraph
         self.object=object
     def mouse_motion(self,x,y):
-        self.object.x,self.object.y=self.mainmap.Screen2Surface(x,y)
-        self.mainmap.queue_draw()
+        self.object.x,self.object.y=self.maingraph.Screen2Surface(x,y)
+        self.maingraph.queue_draw()
         return True
     def mouserelease_middle(self):
-        self.mainmap.evstack.stack.remove(self)
+        self.maingraph.evstack.stack.remove(self)
         return True

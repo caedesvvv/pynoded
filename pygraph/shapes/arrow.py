@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 
-from pygraph.shapes import GraphObject
+from pygraph.graph import GraphObject
 
 class Arrow(GraphObject):
     def __init__(self,color,x0,y0,x1,y1):

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 
-from pygraph.mainmap import *
+from pygraph.maingraph import *
 import gtk
 
 def run(Widget,title="test app"):
@@ -62,4 +62,4 @@ def run(Widget,title="test app"):
     window.present()
     gtk.main()
 
-run(MainMap,"pygraph test")
+run(MainGraph,"pygraph test")

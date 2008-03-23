@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 
-from pygraph.shapes import GraphObject
+from pygraph.graph import GraphObject
 import math
 
 class Circle(GraphObject):

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 
-from pygraph.shapes import GraphObject
+from pygraph.graph import GraphObject
 
 class Square(GraphObject):
     def __init__(self,x,y,w,h,col=(0.1,0.1,0.1)):
