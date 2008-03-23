@@ -3,6 +3,7 @@
 #
 
 from pygraph.graph import GraphObject
+from math import atan2
 
 class Arrow(GraphObject):
     def __init__(self,color,x0,y0,x1,y1):
@@ -13,6 +14,7 @@ class Arrow(GraphObject):
         self.y1=y1
         self.color=color
     def Draw(self,ctx):
+        ctx.save()
         ctx.set_line_width(1)
         linewidth,_ = ctx.device_to_user_distance(1.,1.)
         ctx.set_line_width(linewidth)
@@ -28,4 +30,4 @@ class Arrow(GraphObject):
         ctx.rel_line_to(0,3)
         ctx.fill_preserve()
         ctx.stroke()
-
+        ctx.restore()

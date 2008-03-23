@@ -14,7 +14,8 @@ class MainGraph(gtk.DrawingArea,Graph):
         self.evstack.stack.append(PropagateEvH(self))
         self.pos=(0,0)
         self.scale=1
-        
+        self.objects[1]=[]
+
     def GetPointer(self):
         return self.Screen2Surface(*self.get_pointer())
 
@@ -45,7 +46,11 @@ class MainGraph(gtk.DrawingArea,Graph):
             dest = self
         x,y=self.GetPointer()
         obj_size = 30/self.scale
+<<<<<<< HEAD:pygraph/maingraph.py
         dest.objects.append(GraphNode(self,x-(obj_size/2),y-(obj_size/2),obj_size,obj_size))
+=======
+        self.objects[0].append(GraphNode(self,x-(obj_size/2),y-(obj_size/2),obj_size,obj_size))
+>>>>>>> 4b583ee6a386577b37279b5cd4f7160b45d093b4:pygraph/maingraph.py
         self.evstack.expose()
 
 
