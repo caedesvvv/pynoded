@@ -9,9 +9,7 @@ class MainGraph(gtk.DrawingArea,Graph):
     def __init__(self):
         gtk.DrawingArea.__init__(self)
         Graph.__init__(self)
-        self.evstack=EvStack()
-        self.evstack.stack.append(DefaultEvH(self))
-        self.evstack.stack.append(PropagateEvH(self))
+        self.evstack.insert(0,DefaultEvH(self))
         self.pos=(0,0)
         self.scale=1
         self.objects[1]=[]
@@ -41,13 +39,10 @@ class MainGraph(gtk.DrawingArea,Graph):
         self.pos = map(lambda i: self.pos[i]+post_pos[i]-pre_pos[i],range(2))
         self.queue_draw()
  
-    def NewNode(self,dest=None):
-        if not dest:
-            dest = self
-        x,y=self.GetPointer()
+    def NewNode(self,x,y):
         obj_size = 30/self.scale
         dest.objects[0].append(GraphNode(self,x-(obj_size/2),y-(obj_size/2),obj_size,obj_size))
-        self.evstack.expose()
+        self.queue_draw()
 
 
 class DefaultEvH(EvHandler):
@@ -76,7 +71,7 @@ class DefaultEvH(EvHandler):
 
     def mousepress_right(self):
         x,y=self.maingraph.get_pointer()
-        self.maingraph.evstack.stack.append(ScrollEvH(self.maingraph,x,y))
+        self.maingraph.evstack.append(ScrollEvH(self.maingraph,x,y))
         return True
 
     def mouse_motion(self,x,y):
@@ -110,13 +105,5 @@ class ScrollEvH(EvHandler):
         return True
 
     def mouserelease_right(self):
-        self.maingraph.evstack.stack.remove(self)
+        self.maingraph.evstack.remove(self)
         return True
-
-class PropagateEvH(EvHandler):
-    def __init__(self,maingraph):
-        self.maingraph=maingraph
-
-    def __getattr__(self,name):
-        x,y=self.maingraph.GetPointer()
-        return lambda *args: self.maingraph.Propagate(x,y,name,*args)

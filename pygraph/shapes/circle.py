@@ -13,14 +13,17 @@ class Circle(GraphObject):
         self.w = w
         self.h = h
         self.col = col
+        self.linewidth= 2
+
     def Draw(self,ctx):
-        linewidth,_ = ctx.device_to_user_distance(2.,2.)
-        ctx.set_line_width(linewidth)
+        self.linewidth,_ = ctx.device_to_user_distance(2.,2.)
+        ctx.set_line_width(self.linewidth)
         ctx.set_source_rgb(*self.col)
         ctx.arc (self.x, self.y, self.w, 0, 2 * math.pi)
         ctx.fill_preserve()
         ctx.set_source_rgb( 0,0,0)
         ctx.stroke()
     def Test(self,x,y):
-        return x>=self.x and x<=self.x+self.w and y>=self.y and y<=self.y+self.h
+        r=self.linewidth+self.w
+        return x>=self.x-r and x<=self.x+r and y>=self.y-r and y<=self.y+r
 

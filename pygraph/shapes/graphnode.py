@@ -29,10 +29,10 @@ class NodeConnector(Circle):
         self.maingraph=maingraph
         self.parent=parent
     def mousepress_left(self):
-        self.maingraph.evstack.stack.append(ConnEvH(self.maingraph,self.parent,self))
+        self.maingraph.evstack.append(ConnEvH(self.maingraph,self.parent,self))
         return True
     def connect(self,connevh):
-        self.maingraph.evstack.stack.remove(connevh)
+        self.maingraph.evstack.remove(connevh)
         self.maingraph.objects[1].remove(connevh.arrow)
         self.maingraph.objects[1].append(NodeConnection(connevh.arrow,connevh.source,connevh.source_connector,self.parent,self))
         self.maingraph.queue_draw()
@@ -52,15 +52,14 @@ class NodeConnection(GraphObject):
         self.arrow.y1=self.target.y+self.target_c.y
         self.arrow.Draw(ctx)
 
-class GraphNode(Graph):
-    def __init__(self,maingraph,x,y,w,h):
-        Graph.__init__(self)
+
+
+class GraphNode(RectCollider,Graph):
+    def __init__(self,parent,x,y,w,h):
+        Graph.__init__(self,parent,x,y)
+        RectCollider.__init__(self,w,h)
         self.objects[1]=[]
-        self.x=x
-        self.y=y
-        self.w=w
         self.objects[0].append(Square(0,0,w,h))
-        self.maingraph=maingraph
         self.inp_r = h/15.
         self.stride = h/5
         self.inputs = []
@@ -73,35 +72,32 @@ class GraphNode(Graph):
         for i in xrange(noutlets):
             col_idx = random.randint(0,4)
             self.AddOutlet(i,colors[col_idx])
-    def Test(self,x,y):
-        return Graph.Test(self,x-self.x,y-self.y)
+        self.evstack.insert(0,GraphNodeEvH(self.parent,self))
+
     def AddInlet(self,i,col):
-        self.objects[1].append(NodeConnector(self.maingraph,self,0,(1+i)*self.stride,self.inp_r,self.inp_r,col))
+        self.objects[1].append(NodeConnector(self.parent,self,0,(1+i)*self.stride,self.inp_r,self.inp_r,col))
     def AddOutlet(self,i,col):
-        self.objects[1].append(NodeConnector(self.maingraph,self,self.w,(1+i)*self.stride,self.inp_r,self.inp_r,col))
-    def Draw(self,ctx):
-        ctx.save()
-        ctx.translate(self.x,self.y)
-        Graph.Draw(self,ctx)
-        ctx.restore()
+        self.objects[1].append(NodeConnector(self.parent,self,self.w,(1+i)*self.stride,self.inp_r,self.inp_r,col))
+    def NewNode(self,x,y):
+        obj_size = 30/self.scale
+        self.objects[0].append(GraphNode(self,x-(obj_size/2),y-(obj_size/2),obj_size,obj_size))
+        self.Redraw()
+
+
+class GraphNodeEvH(EvHandler):
+    def __init__(self,graphnode):
+        self.graphnode=graphnode
+
     def mousepress_middle(self):
-        self.maingraph.evstack.stack.append(MoveEvH(self.maingraph,self))
-        self.maingraph.objects[0].remove(self)
-        self.maingraph.objects[0].append(self)
-        self.maingraph.queue_draw()
+        self.graphnode.parent.evstack.append(MoveEvH(self.graphnode.parent,self.graphnode))
+        self.graphnode.parent.objects[0].remove(self)
+        self.graphnode.parent.objects[0].append(self)
+        self.graphnode.parent.queue_draw()
         return True
 
-    def Propagate(self,event,*args):
-        x,y=self.maingraph.GetPointer()
-        return Graph.Propagate(self,x-self.x,y-self.y,event,*args)
-                         
-    def mousepress_left(self):
-        return self.Propagate("mousepress_left")
-    def connect(self,source):
-        return self.Propagate("connect",source)
     def keypress_c(self):
-        if not self.Propagate("keypress_c"):
-            self.maingraph.NewNode(self)
-            return True
+        x,y=self.graphnode.GetPointer()
+        self.graphnode.NewNode(x,y)
+        return True
 
 

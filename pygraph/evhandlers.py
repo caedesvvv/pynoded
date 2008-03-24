@@ -1,19 +1,13 @@
 from evhandler import EvHandler
-class PropagateEvH(EvHandler):
-    def __init__(self,graph):
-        self.graph=graph
-
-    def __getattr__(self,name):
-        return lambda *args: self.graph.Propagate(name,*args)
 
 class MoveEvH(EvHandler):
-    def __init__(self,maingraph,object):
-        self.maingraph=maingraph
+    def __init__(self,evstack,object):
+        self.evstack=evstack
         self.object=object
     def mouse_motion(self,x,y):
-        self.object.x,self.object.y=self.maingraph.Screen2Surface(x,y)
-        self.maingraph.queue_draw()
+        self.object.x,self.object.y=self.object.parent.Screen2Surface(x,y)
+        self.object.queue_draw()
         return True
     def mouserelease_middle(self):
-        self.maingraph.evstack.stack.remove(self)
+        self.evstack.remove(self)
         return True
