@@ -9,11 +9,11 @@ import random
 colors = [(1,0,0),(0,1,0),(1,1,1),(1,0,1),(0,0,1)]
 
 class ConnEvH(EvHandler):
-    def __init__(self,maingraph,source,source_connector):
-        self.maingraph=maingraph
-        self.source=source
-        self.source_connector=source_connector
-        self.arrow=Arrow((0,0,0.7),source.x+source_connector.x,source.y+source_connector.y,0,0)
+    def __init__(self,source_c):
+        self.maingraph=source_c.maingraph
+        self.source=source_c.parent
+        self.source_c=source_c
+        self.arrow=Arrow((0,0,0.7),source.source_c.x,source.y+source_c.y,0,0)
         self.maingraph.objects[1].append(self.arrow)
     def mousepress_left(self):
         x,y=self.maingraph.GetPointer()
@@ -25,25 +25,29 @@ class ConnEvH(EvHandler):
 
 class NodeConnector(Circle):
     def __init__(self,maingraph,parent,x,y,w,h,col):
-        Circle.__init__(self,x,y,w,h,col)
+        Circle.__init__(self,parent,x,y,w,h,col)
         self.maingraph=maingraph
-        self.parent=parent
+        self.evstack.append(NodeConnectorEvH(self))
+
+class NodeConnectorEvH(EvHandler):
+    def __init__(self,nodeconn):
+        self.nodeconn=nodeconn
     def mousepress_left(self):
-        self.maingraph.evstack.append(ConnEvH(self.maingraph,self.parent,self))
+        self.nodeconn.maingraph.evstack.append(ConnEvH(self.nodeconn))
         return True
     def connect(self,connevh):
-        self.maingraph.evstack.remove(connevh)
-        self.maingraph.objects[1].remove(connevh.arrow)
-        self.maingraph.objects[1].append(NodeConnection(connevh.arrow,connevh.source,connevh.source_connector,self.parent,self))
-        self.maingraph.queue_draw()
+        self.nodeconn.maingraph.evstack.remove(connevh)
+        self.nodeconn.maingraph.objects[1].remove(connevh.arrow)
+        self.nodeconn.maingraph.objects[1].append(NodeConnection(connevh.arrow,connevh.source_connector,self.nodeconn))
+        self.nodeconn.Redraw()
         return True
 
 class NodeConnection(GraphObject):
-    def __init__(self,arrow,source,source_c,target,target_c):
+    def __init__(self,arrow,source_c,target_c):
         self.arrow=arrow
-        self.source=source
+        self.source=source_c.parent
         self.source_c=source_c
-        self.target=target
+        self.target=target_c.parent
         self.target_c=target_c
     def Draw(self,ctx):
         self.arrow.x0=self.source.x+self.source_c.x
