@@ -36,8 +36,9 @@ class RectCollider(Collider):
 
 class GraphObject(Drawable,Collider):
     def __init__(self,parent,x,y,scale=1.0):
-        self.parent=parent
-        Drawable.__init__(x,y,scale)
+        if parent:
+            self.parent=parent
+        Drawable.__init__(self,x,y,scale)
         self.evstack=EvStack()
     def GetPointer(self):
         return self.ToLocal(*self.parent.GetPointer())

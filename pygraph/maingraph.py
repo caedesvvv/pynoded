@@ -8,10 +8,8 @@ import cairo
 class MainGraph(gtk.DrawingArea,Graph):
     def __init__(self):
         gtk.DrawingArea.__init__(self)
-        Graph.__init__(self)
+        Graph.__init__(self,None,0,0)
         self.evstack.insert(0,DefaultEvH(self))
-        self.pos=(0,0)
-        self.scale=1
         self.objects[1]=[]
 
     def GetPointer(self):
@@ -27,16 +25,16 @@ class MainGraph(gtk.DrawingArea,Graph):
         ctx.translate (*self.pos)
         Graph.Draw(self,ctx)
 
-    def Screen2Surface(self,x,y):
-        x = float(x)
-        y = float(y)
-        return [(x/self.scale)-self.pos[0],(y/self.scale)-self.pos[1]]
+#    def Screen2Surface(self,x,y):
+#        x = float(x)
+#        y = float(y)
+#        return [(x/self.scale)-self.pos[0],(y/self.scale)-self.pos[1]]
 
     def Zoom(self,x,y,factor):
-        pre_pos = self.Screen2Surface(x,y)
+        pre_pos = self.ToLocal(x,y)
         self.scale *=factor
-        post_pos = self.Screen2Surface(x,y)
-        self.pos = map(lambda i: self.pos[i]+post_pos[i]-pre_pos[i],range(2))
+        post_pos = self.ToLocal(x,y)
+        self.x,self.y = map(lambda i: self.pos[i]+post_pos[i]-pre_pos[i],range(2))
         self.queue_draw()
  
     def NewNode(self,x,y):
