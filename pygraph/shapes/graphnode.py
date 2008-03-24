@@ -13,15 +13,16 @@ class ConnEvH(EvHandler):
         self.maingraph=source_c.maingraph
         self.source=source_c.parent
         self.source_c=source_c
-        self.arrow=Arrow((0,0,0.7),source.source_c.x,source.y+source_c.y,0,0)
+        self.arrow=Arrow((0,0,0.7),source.x+source_c.x,source.y+source_c.y,0,0)
         self.maingraph.objects[1].append(self.arrow)
+
     def mousepress_left(self):
         x,y=self.maingraph.GetPointer()
         return self.maingraph.Propagate(x,y,"connect",self)
         
     def mouse_motion(self,x,y):
         self.arrow.x1,self.arrow.y1=self.maingraph.GetPointer()
-        self.maingraph.queue_draw()
+        self.maingraph.Redraw()
 
 class NodeConnector(Circle):
     def __init__(self,maingraph,parent,x,y,w,h,col):
@@ -50,8 +51,8 @@ class NodeConnection(GraphObject):
         self.target=target_c.parent
         self.target_c=target_c
     def Draw(self,ctx):
-        self.arrow.x0=self.source.x+self.source_c.x
-        self.arrow.y0=self.source.y+self.source_c.y
+        self.arrow.x=self.source.x+self.source_c.x
+        self.arrow.y=self.source.y+self.source_c.y
         self.arrow.x1=self.target.x+self.target_c.x
         self.arrow.y1=self.target.y+self.target_c.y
         self.arrow.Draw(ctx)
