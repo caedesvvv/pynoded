@@ -25,8 +25,8 @@ class ConnEvH(EvHandler):
         self.maingraph.Redraw()
 
 class NodeConnector(Circle):
-    def __init__(self,maingraph,parent,x,y,w,h,col):
-        Circle.__init__(self,parent,x,y,w,h,col)
+    def __init__(self,maingraph,parent,x,y,r,col):
+        Circle.__init__(self,parent,x,y,r,col)
         self.maingraph=maingraph
         self.evstack.append(NodeConnectorEvH(self))
 
@@ -64,7 +64,7 @@ class GraphNode(RectCollider,Graph):
         Graph.__init__(self,parent,x,y)
         RectCollider.__init__(self,w,h)
         self.objects[1]=[]
-        self.objects[0].append(Square(0,0,w,h))
+        self.objects[0].append(Square(self,0,0,w,h))
         self.inp_r = h/15.
         self.stride = h/5
         self.inputs = []
@@ -77,12 +77,12 @@ class GraphNode(RectCollider,Graph):
         for i in xrange(noutlets):
             col_idx = random.randint(0,4)
             self.AddOutlet(i,colors[col_idx])
-        self.evstack.insert(0,GraphNodeEvH(self.parent,self))
+        self.evstack.insert(0,GraphNodeEvH(self))
 
     def AddInlet(self,i,col):
-        self.objects[1].append(NodeConnector(self.parent,self,0,(1+i)*self.stride,self.inp_r,self.inp_r,col))
+        self.objects[1].append(NodeConnector(self.parent,self,0,(1+i)*self.stride,self.inp_r,col))
     def AddOutlet(self,i,col):
-        self.objects[1].append(NodeConnector(self.parent,self,self.w,(1+i)*self.stride,self.inp_r,self.inp_r,col))
+        self.objects[1].append(NodeConnector(self.parent,self,self.w,(1+i)*self.stride,self.inp_r,col))
     def NewNode(self,x,y):
         obj_size = 30/self.scale
         self.objects[0].append(GraphNode(self,x-(obj_size/2),y-(obj_size/2),obj_size,obj_size))
@@ -94,9 +94,9 @@ class GraphNodeEvH(EvHandler):
         self.graphnode=graphnode
 
     def mousepress_middle(self):
-        self.graphnode.parent.evstack.append(MoveEvH(self.graphnode.parent,self.graphnode))
-        self.graphnode.parent.objects[0].remove(self)
-        self.graphnode.parent.objects[0].append(self)
+        self.graphnode.parent.evstack.append(MoveEvH(self.graphnode.parent.evstack,self.graphnode))
+        self.graphnode.parent.objects[0].remove(self.graphnode)
+        self.graphnode.parent.objects[0].append(self.graphnode)
         self.graphnode.parent.queue_draw()
         return True
 

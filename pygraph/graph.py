@@ -72,4 +72,5 @@ class PropagateEvH(EvHandler):
         self.graph=graph
 
     def __getattr__(self,name):
-        return lambda x,y,*args: self.graph.Propagate(x,y,name,*args)
+        x,y=self.graph.GetPointer()
+        return lambda *args: self.graph.Propagate(x,y,name,*args)

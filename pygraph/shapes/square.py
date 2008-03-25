@@ -5,8 +5,8 @@
 from pygraph.graph import GraphObject,RectCollider
 
 class Square(RectCollider,GraphObject):
-    def __init__(self,x,y,w,h,col=(0.1,0.1,0.1)):
-        GraphObject.__init__(self,x,y)
+    def __init__(self,parent,x,y,w,h,col=(0.1,0.1,0.1)):
+        GraphObject.__init__(self,parent,x,y)
         RectCollider.__init__(self,w,h)
         self.col = col
 

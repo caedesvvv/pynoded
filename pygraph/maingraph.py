@@ -13,7 +13,7 @@ class MainGraph(gtk.DrawingArea,Graph):
         self.objects[1]=[]
 
     def GetPointer(self):
-        return self.Screen2Surface(*self.get_pointer())
+        return self.ToLocal(*self.get_pointer())
 
     def Draw(self,ctx):
         # set the background
@@ -22,7 +22,7 @@ class MainGraph(gtk.DrawingArea,Graph):
         ctx.paint()
         # apply scale and position
         ctx.scale(self.scale,self.scale)
-        ctx.translate (*self.pos)
+        ctx.translate (self.x,self.y)
         Graph.Draw(self,ctx)
 
 #    def Screen2Surface(self,x,y):
@@ -34,12 +34,15 @@ class MainGraph(gtk.DrawingArea,Graph):
         pre_pos = self.ToLocal(x,y)
         self.scale *=factor
         post_pos = self.ToLocal(x,y)
-        self.x,self.y = map(lambda i: self.pos[i]+post_pos[i]-pre_pos[i],range(2))
+        self_pos = self.x,self.y
+        self.x,self.y = map(lambda i: self_pos[i]+post_pos[i]-pre_pos[i],range(2))
         self.queue_draw()
  
     def NewNode(self,x,y):
         obj_size = 30/self.scale
-        dest.objects[0].append(GraphNode(self,x-(obj_size/2),y-(obj_size/2),obj_size,obj_size))
+        self.objects[0].append(GraphNode(self,x-(obj_size/2),y-(obj_size/2),obj_size,obj_size))
+        self.queue_draw()
+    def Redraw(self):
         self.queue_draw()
 
 
@@ -64,7 +67,7 @@ class DefaultEvH(EvHandler):
         return True
 
     def keypress_c(self):
-        self.maingraph.NewNode()
+        self.maingraph.NewNode(*self.maingraph.GetPointer())
         return True
 
     def mousepress_right(self):
@@ -90,16 +93,16 @@ class DefaultEvH(EvHandler):
 class ScrollEvH(EvHandler):
     def __init__(self,maingraph,initmx,initmy):
         self.maingraph=maingraph
-        self.initpos=maingraph.pos
+        self.initpos=maingraph.x,maingraph.y
         self.initmx=initmx
         self.initmy=initmy
 
     def mouse_motion(self,x,y):
         dx,dy=float(x-self.initmx),float(y-self.initmy)
-        self.maingraph.pos=(self.maingraph.pos[0]+dx/self.maingraph.scale,self.maingraph.pos[1]+dy/self.maingraph.scale)
-        self.initpos=self.maingraph.pos
+        self.maingraph.pos=(self.maingraph.x+dx/self.maingraph.scale,self.maingraph.y+dy/self.maingraph.scale)
+        self.initpos=maingraph.x,maingraph.y
         self.initmx,self.initmy=x,y
-        self.maingraph.queue_draw()
+        self.maingraph.Redraw()
         return True
 
     def mouserelease_right(self):
