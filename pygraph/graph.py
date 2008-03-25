@@ -51,8 +51,13 @@ class GraphObject(Drawable,Collider):
         return self.ToLocal(*self.parent.GetPointer())
     def Redraw(self):
         self.parent.Redraw()
-    def ToGlobal(self,x,y):
-        return self.parent.ToGlobal(*self.FromLocal(x,y))
+    def ToParent(self,obj,x,y):
+        if obj==self:
+            return (x,y)
+        else:
+            return self.parent.ToParent(obj,*self.FromLocal(x,y))
+    def Root(self):
+        return self.parent.Root()
 
 class Graph(GraphObject):
     def __init__(self,parent,x,y,scale=1.0):

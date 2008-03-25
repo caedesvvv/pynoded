@@ -5,10 +5,8 @@
 from pygraph.maingraph import *
 import gtk
 
-def run(Widget,title="test app"):
+def run(widget,evh,title="test app"):
     window = gtk.Window()
-    widget = Widget()
-    evh=widget.evstack
     def key_press_event(widget,ev):
         if ev.string=="+":
             evh.keypress_plus()
@@ -64,4 +62,5 @@ def run(Widget,title="test app"):
     window.present()
     gtk.main()
 
-run(MainGraph,"pygraph test")
+mg=MainGraph()
+run(mg.widget,mg.evstack,"pygraph test")

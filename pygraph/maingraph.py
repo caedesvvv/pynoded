@@ -5,15 +5,16 @@ from shapes import GraphNode
 import gtk
 import cairo
 
-class MainGraph(gtk.DrawingArea,Graph):
+class MainGraph(Graph):
     def __init__(self):
-        gtk.DrawingArea.__init__(self)
+        self.widget=gtk.DrawingArea()
+        self.parent=self
         Graph.__init__(self,None,0,0)
         self.evstack.insert(0,DefaultEvH(self))
         self.objects[1]=[]
 
     def GetPointer(self):
-        return self.ToLocal(*self.get_pointer())
+        return self.ToLocal(*self.widget.get_pointer())
 
     def Draw(self,ctx):
         # set the background
@@ -35,29 +36,34 @@ class MainGraph(gtk.DrawingArea,Graph):
         self.Redraw()
 
     def Redraw(self):
-        self.queue_draw()
+        self.widget.queue_draw()
 
     def ToGlobal(self,x,y):
         return (x,y)
+
+    def Root(self):
+        return self
+    def Test(self,x,y):
+        return True
 
 class DefaultEvH(EvHandler):
     def __init__(self,maingraph):
         self.maingraph=maingraph
 
     def scroll_up(self):
-        x,y=self.maingraph.get_pointer()
+        x,y=self.maingraph.widget.get_pointer()
         self.maingraph.Zoom(x,y,1/0.99)
         
     def keypress_plus(self):
-        self.maingraph.Zoom(self.maingraph.allocation.width/2,self.maingraph.allocation.height/2,1/0.99)
+        self.maingraph.Zoom(self.maingraph.widget.allocation.width/2,self.maingraph.widget.allocation.height/2,1/0.99)
         return True
 
     def scroll_down(self):
-        x,y=self.maingraph.get_pointer()
+        x,y=self.maingraph.widget.get_pointer()
         self.maingraph.Zoom(x,y,0.99)
 
     def keypress_minus(self):
-        self.maingraph.Zoom(self.maingraph.allocation.width/2,self.maingraph.allocation.height/2,0.99)
+        self.maingraph.Zoom(self.maingraph.widget.allocation.width/2,self.maingraph.widget.allocation.height/2,0.99)
         return True
 
     def keypress_c(self):
@@ -65,7 +71,7 @@ class DefaultEvH(EvHandler):
         return True
 
     def mousepress_right(self):
-        x,y=self.maingraph.get_pointer()
+        x,y=self.maingraph.widget.get_pointer()
         self.maingraph.evstack.append(ScrollEvH(self.maingraph,x,y))
         return True
 
@@ -73,15 +79,15 @@ class DefaultEvH(EvHandler):
         return True
 
     def expose(self):
-        _,_,width,height=self.maingraph.allocation
-        pixmap = gtk.gdk.Pixmap (self.maingraph.window, width, height)
+        _,_,width,height=self.maingraph.widget.allocation
+        pixmap = gtk.gdk.Pixmap (self.maingraph.widget.window, width, height)
         ctx = pixmap.cairo_create()
 
         self.maingraph.Draw(ctx)
 
         # draw on window
-        gc = gtk.gdk.GC(self.maingraph.window)
-        self.maingraph.window.draw_drawable(gc, pixmap, 0,0, 0,0, -1,-1)
+        gc = gtk.gdk.GC(self.maingraph.widget.window)
+        self.maingraph.widget.window.draw_drawable(gc, pixmap, 0,0, 0,0, -1,-1)
         return True
 
 class ScrollEvH(EvHandler):
