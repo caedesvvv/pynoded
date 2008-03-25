@@ -85,7 +85,15 @@ class GraphNode(RectCollider,Graph):
     def AddOutlet(self,i,col):
         self.objects[1].append(NodeConnector(self.parent,self,self.w,(1+i)*self.stride,self.inp_r,col))
     def NewNode(self,x,y):
-        obj_size = 30/self.scale
+	obj_size = self.scale
+	parent = self.parent
+	while parent:
+		try:
+			obj_size *= parent.scale
+			parent = parent.parent
+		except:
+			parent = None
+        obj_size = 30/obj_size
         self.objects[0].append(GraphNode(self,x-(obj_size/2),y-(obj_size/2),obj_size,obj_size))
         self.Redraw()
 
@@ -95,10 +103,11 @@ class GraphNodeEvH(EvHandler):
         self.graphnode=graphnode
 
     def mousepress_middle(self):
-        self.graphnode.parent.evstack.append(MoveEvH(self.graphnode.parent.evstack,self.graphnode))
+        x,y=self.graphnode.GetPointer()
+        self.graphnode.parent.evstack.append(MoveEvH(self.graphnode.parent.evstack,self.graphnode,x,y))
         self.graphnode.parent.objects[0].remove(self.graphnode)
         self.graphnode.parent.objects[0].append(self.graphnode)
-        self.graphnode.parent.queue_draw()
+        self.graphnode.parent.Redraw()
         return True
 
     def keypress_c(self):
