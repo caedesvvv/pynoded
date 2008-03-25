@@ -8,8 +8,8 @@ class Drawable(object):
 
     def Draw(self,ctx):
         ctx.save()
-        ctx.scale(self.scale,self.scale)
         ctx.translate(self.x,self.y)
+        ctx.scale(self.scale,self.scale)
         self.Draw_(ctx)
         ctx.restore()
 

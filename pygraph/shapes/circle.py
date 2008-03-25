@@ -16,7 +16,7 @@ class Circle(RectCollider,GraphObject):
         linewidth,_ = ctx.device_to_user_distance(2.,2.)
         ctx.set_line_width(linewidth)
         ctx.set_source_rgb(*self.col)
-        ctx.arc (self.r, self.r, self.r, 0, 2 * math.pi)
+        ctx.arc (0, 0, self.r, 0, 2 * math.pi)
         ctx.fill_preserve()
         ctx.set_source_rgb( 0,0,0)
         ctx.stroke()
