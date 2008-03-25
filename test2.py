@@ -17,6 +17,8 @@ def run(widget,evh,title="test app"):
     def key_release_event(widget,ev):
         pass
     def button_press_event(widget,ev):
+        if ev.type!=gtk.gdk.BUTTON_PRESS:
+            return
         if ev.button==1:
             evh.mousepress_left()
         elif ev.button==2:

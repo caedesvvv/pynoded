@@ -95,9 +95,9 @@ class GraphNode(RectCollider,Graph):
         root=self.Root()
 	while True:
             obj_size *= parent.scale
-            parent = parent.parent
             if parent==root:
                 break
+            parent = parent.parent
 
         obj_size = 30/obj_size
         self.objects[0].append(GraphNode(self,x-(obj_size/2),y-(obj_size/2),obj_size,obj_size))
