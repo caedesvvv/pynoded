@@ -61,7 +61,6 @@ class Graph(GraphObject):
         return o and getattr(o.evstack,event,False) and getattr(o.evstack,event)(*args)
 
     def ObjectAt(self,x,y):
-        x,y=self.ToLocal(x,y)
         for prio in reversed(self.objects.values()):
             for o in reversed(prio):
                 if o.Test(x,y):

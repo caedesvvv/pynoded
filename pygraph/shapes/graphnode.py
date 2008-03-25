@@ -34,6 +34,7 @@ class NodeConnectorEvH(EvHandler):
     def __init__(self,nodeconn):
         self.nodeconn=nodeconn
     def mousepress_left(self):
+        print "mousepress_left"
         self.nodeconn.maingraph.evstack.append(ConnEvH(self.nodeconn))
         return True
     def connect(self,connevh):
