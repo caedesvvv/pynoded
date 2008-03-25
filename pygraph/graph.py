@@ -1,4 +1,5 @@
 from evhandler import EvHandler,EvStack
+from math import *
 
 class Drawable(object):
     def __init__(self,x,y,scale=1.0):
@@ -24,8 +25,14 @@ class Drawable(object):
 
 class Collider(object):
      def Test(self,x,y):
-         raise "Not implemented!"
+         raise repr(self),"Not implemented!"
 
+class CircleCollider(Collider):
+    def __init__(self,r):
+        self.r=r
+    def Test(self,x,y):
+        return sqrt((x-self.x)**2+(y-self.y)**2)<=self.r
+    
 class RectCollider(Collider):
     def __init__(self,w,h):
         self.w=w
@@ -44,6 +51,8 @@ class GraphObject(Drawable,Collider):
         return self.ToLocal(*self.parent.GetPointer())
     def Redraw(self):
         self.parent.Redraw()
+    def ToGlobal(self,x,y):
+        return self.parent.ToGlobal(*self.FromLocal(x,y))
 
 class Graph(GraphObject):
     def __init__(self,parent,x,y,scale=1.0):

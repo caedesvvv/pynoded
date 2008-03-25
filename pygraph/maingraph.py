@@ -37,6 +37,8 @@ class MainGraph(gtk.DrawingArea,Graph):
     def Redraw(self):
         self.queue_draw()
 
+    def ToGlobal(self,x,y):
+        return (x,y)
 
 class DefaultEvH(EvHandler):
     def __init__(self,maingraph):
