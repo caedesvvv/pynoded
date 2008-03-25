@@ -100,7 +100,7 @@ class ScrollEvH(EvHandler):
     def mouse_motion(self,x,y):
         dx,dy=float(x-self.initmx),float(y-self.initmy)
         self.maingraph.pos=(self.maingraph.x+dx/self.maingraph.scale,self.maingraph.y+dy/self.maingraph.scale)
-        self.initpos=maingraph.x,maingraph.y
+        self.initpos=self.maingraph.x,self.maingraph.y
         self.initmx,self.initmy=x,y
         self.maingraph.Redraw()
         return True
