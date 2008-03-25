@@ -20,28 +20,20 @@ class MainGraph(gtk.DrawingArea,Graph):
         ctx.set_source_rgb(0.7,0.7,0.7)
         ctx.set_operator (cairo.OPERATOR_SOURCE)
         ctx.paint()
-        # apply scale and position
-        ctx.translate (self.x,self.y)
-        ctx.scale(self.scale,self.scale)
         Graph.Draw(self,ctx)
 
-#    def Screen2Surface(self,x,y):
-#        x = float(x)
-#        y = float(y)
-#        return [(x/self.scale)-self.pos[0],(y/self.scale)-self.pos[1]]
-
     def Zoom(self,x,y,factor):
-        pre_pos = self.ToLocal(x,y)
+        pre_x,pre_y = self.ToLocal(x,y)
         self.scale *=factor
-        post_pos = self.ToLocal(x,y)
-        self_pos = self.x,self.y
-        self.x,self.y = map(lambda i: self_pos[i]+post_pos[i]-pre_pos[i],range(2))
-        self.queue_draw()
+        post_x,post_y = self.ToLocal(x,y)
+        self.x,self.y = (self.x+post_x-pre_x,self.y+post_y-pre_y)
+        self.Redraw()
  
     def NewNode(self,x,y):
         obj_size = 30/self.scale
         self.objects[0].append(GraphNode(self,x-(obj_size/2),y-(obj_size/2),obj_size,obj_size))
-        self.queue_draw()
+        self.Redraw()
+
     def Redraw(self):
         self.queue_draw()
 
@@ -99,7 +91,7 @@ class ScrollEvH(EvHandler):
 
     def mouse_motion(self,x,y):
         dx,dy=float(x-self.initmx),float(y-self.initmy)
-        self.maingraph.pos=(self.maingraph.x+dx/self.maingraph.scale,self.maingraph.y+dy/self.maingraph.scale)
+        self.maingraph.x,self.maingraph.y=(self.maingraph.x+dx/self.maingraph.scale,self.maingraph.y+dy/self.maingraph.scale)
         self.initpos=self.maingraph.x,self.maingraph.y
         self.initmx,self.initmy=x,y
         self.maingraph.Redraw()
