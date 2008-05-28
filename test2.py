@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 
-from pygraph.maingraph import *
+from pygraph.gtkmaingraph import *
 import gtk
 
 def run(widget,evh,title="test app"):
@@ -64,5 +64,5 @@ def run(widget,evh,title="test app"):
     window.present()
     gtk.main()
 
-mg=MainGraph()
+mg=GtkMainGraph()
 run(mg.widget,mg.evstack,"pygraph test")

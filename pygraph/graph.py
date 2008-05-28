@@ -1,7 +1,14 @@
+"""
+Base graph objects
+"""
+
 from evhandler import EvHandler,EvStack
 from math import *
 
 class Drawable(object):
+    """
+    Base class for drawable objects.
+    """
     def __init__(self,x,y,scale=1.0):
         self.x=x
         self.y=y
@@ -21,19 +28,33 @@ class Drawable(object):
         return (self.x+x*self.scale,self.y+y*self.scale)
 
     def Draw_(self,ctx):
+        """
+        Main method to do the cairo drawing of the object.
+        This is the main function drawable objects have to override.
+        @param ctx: cairo context
+        """
         pass
 
 class Collider(object):
+     """
+     Base class for colliders.
+     """
      def Test(self,x,y):
          raise repr(self),"Not implemented!"
 
 class CircleCollider(Collider):
+    """
+    A circle collider.
+    """
     def __init__(self,r):
         self.r=r
     def Test(self,x,y):
         return sqrt((x-self.x)**2+(y-self.y)**2)<=self.r
     
 class RectCollider(Collider):
+    """
+    A rect collider.
+    """
     def __init__(self,w,h):
         self.w=w
         self.h=h
@@ -42,6 +63,9 @@ class RectCollider(Collider):
         return x>=self.x and x<=self.x+self.w and y>=self.y and y<=self.y+self.h
 
 class GraphObject(Drawable,Collider):
+    """
+    Base class for graph objects.
+    """
     def __init__(self,parent,x,y,scale=1.0):
         if parent:
             self.parent=parent
@@ -60,6 +84,9 @@ class GraphObject(Drawable,Collider):
         return self.parent.Root()
 
 class Graph(GraphObject):
+    """
+    A graph capable of containing connected objects.
+    """
     def __init__(self,parent,x,y,scale=1.0):
         GraphObject.__init__(self,parent,x,y,scale)
         self.objects={0:[]}
@@ -81,7 +108,14 @@ class Graph(GraphObject):
                     return o
 
 class PropagateEvH(EvHandler):
+    """
+    Event handler for propagating to children.
+    """
     def __init__(self,graph):
+        """
+        PropagateEvH Constructor.
+        @param graph: graph to which this event handler is attached.
+        """
         self.graph=graph
 
     def __getattr__(self,name):

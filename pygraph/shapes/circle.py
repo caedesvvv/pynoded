@@ -1,12 +1,23 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-#
+"""
+Circle shapes
+"""
 
 from pygraph.graph import GraphObject,CircleCollider
 import math
 
 class Circle(CircleCollider,GraphObject):
+    """
+    A circle shape.
+    """
     def __init__(self,parent,x,y,r,col=(0.1,0.1,0.1)):
+        """
+        Circle constructor.
+        @param parent: parent graphobject.
+        @param x: x position relative to parent
+        @param y: y position relative to parent
+        @param r: radius for the circle
+        @param col: color for the circle
+        """
         GraphObject.__init__(self,parent,x,y)
         CircleCollider.__init__(self,r)
         self.col = col

@@ -1,6 +1,13 @@
+"""
+Miscelaneus Event Handlers
+"""
+
 from evhandler import EvHandler
 
 class MoveEvH(EvHandler):
+    """
+    Event handler for stacking when dragging an object.
+    """
     def __init__(self,object,x,y):
         self.evstack=object.Root().evstack
         self.object=object
