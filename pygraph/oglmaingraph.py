@@ -37,10 +37,9 @@ class OpenglMainGraph(Graph):
         self.Width = w
         self.Height = h
         self.CreateContext()
-    def Draw(self,ctx=None):
+    def Draw(self):
         # set the background
-        if not ctx:
-            ctx = self.ctx
+        ctx = self.ctx
         ctx.set_source_rgb(0.7,0.7,0.7)
         ctx.set_operator (cairo.OPERATOR_SOURCE)
         ctx.paint()

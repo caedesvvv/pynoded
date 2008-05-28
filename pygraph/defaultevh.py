@@ -42,6 +42,7 @@ class DefaultEvH(EvHandler):
         return True
 
     def expose(self):
+        self.maingraph.CreateContext()
         self.maingraph.Draw()
         # draw on window
         self.maingraph.Blit()

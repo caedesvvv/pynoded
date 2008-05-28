@@ -22,6 +22,9 @@ class GtkMainGraph(Graph):
         Graph.__init__(self,None,0,0)
         self.evstack.insert(0,DefaultEvH(self))
         self.objects[1]=[]
+        self.ctx = None
+        self._prevw = 0
+        self._prevh = 0
 
     def GetPointer(self):
         return self.ToLocal(*self.widget.get_pointer())
@@ -29,17 +32,22 @@ class GtkMainGraph(Graph):
     def GetRawPointer(self):
         return self.widget.get_pointer()
 
-    def Draw(self,ctx):
+    def Draw(self):
         # set the background
-        ctx.set_source_rgb(0.7,0.7,0.7)
-        ctx.set_operator (cairo.OPERATOR_SOURCE)
-        ctx.paint()
-        Graph.Draw(self,ctx)
+        self.ctx.set_source_rgb(0.7,0.7,0.7)
+        self.ctx.set_operator (cairo.OPERATOR_SOURCE)
+        self.ctx.paint()
+        Graph.Draw(self,self.ctx)
 
     def CreateContext(self):
+        if self.Width == self._prevw and self.Height == self._prevh:
+            return
         self.pixmap = gtk.gdk.Pixmap (self.widget.window, 
                                  self.Width, self.Height)
+        self._prevw = self.Width
+        self._prevh = self.Height
         ctx = self.pixmap.cairo_create()
+        self.ctx = ctx
         return ctx
 
     def Blit(self):

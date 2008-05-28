@@ -35,7 +35,7 @@ class GraphNode(RectCollider,Graph):
     """
     A simple graph node with a label and left to right inlets and outlets.
     """
-    def __init__(self,parent,x,y,w,h,name="",ninlets=None,noutlets=None,evhandler=GraphNodeEvH,col=(0.1,0.1,0.1)):
+    def __init__(self,parent,x,y,w,h,name="",ninlets=None,noutlets=None,evhandler=GraphNodeEvH,col=(1,1,1)):
         """
         Constructor.
         @param parent: parent graphobject.
@@ -94,10 +94,10 @@ class GraphNode(RectCollider,Graph):
         """
         Create a new node children of this one
         """
-	obj_size = self.scale
-	parent = self.parent
+        obj_size = self.scale
+        parent = self.parent
         root=self.Root()
-	while True:
+        while True:
             obj_size *= parent.scale
             if parent==root:
                 break
