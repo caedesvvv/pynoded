@@ -12,27 +12,20 @@ bi = "pygraph"
 wdirs = []
 
 for root, dirs, files in os.walk(bi):
-	
-	wd = root.split('/')
-	wd = '.'.join(wd)
-	#print wd
-
-	wdirs.append(wd)
-	if '.svn' in dirs:
+    wd = root.split('/')
+    wd = '.'.join(wd)
+    wdirs.append(wd)
+    if '.svn' in dirs:
             dirs.remove('.svn')
-	
 
-#print wdirs
-
-    
 setup(
     name = "pygraph",
-    version = "0.1",    
+    version = "0.1",
     packages = ['pygraph'] + wdirs,
     package_data = {
         # If any package contains *.txt or *.rst files, include them:
         '': ['*.txt', '*.xml','hellow.py'],
-        'examples':['*.*'],        
+        'examples':['*.*'],
         },
     zip_safe = True,
     include_package_data = True,
@@ -59,7 +52,7 @@ Topic :: Software Development :: User Interfaces
     platforms = ["any"],
     requires = ["cairo",'pycairo','pango'],
     license = "GPL",
-    keywords = "GUI Graph cairo",    
+    keywords = "GUI Graph cairo",
     url = "http://delcorp.org",   # project home page, if any
     download_url = "http://delcorp.org",
 )
