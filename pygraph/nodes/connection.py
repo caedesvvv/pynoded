@@ -42,7 +42,10 @@ class NodeConnectorEvH(EvHandler):
         maingraph=self.nodeconn.Root()
         maingraph.evstack.remove(connevh)
         connevh.maingraph.objects[1].remove(connevh.arrow)
-        connevh.maingraph.objects[1].append(NodeConnection(connevh.arrow,connevh.source_c,self.nodeconn))
+        newcon = NodeConnection(connevh.arrow,connevh.source_c,self.nodeconn)
+        connevh.maingraph.objects[1].append(newcon) # add arrow to graph
+        connevh.source_c.outputs.append(newcon) # add connection to source
+        self.nodeconn.inputs.append(newcon) # add conection to target input
         maingraph.Redraw()
         return True
 
@@ -54,7 +57,20 @@ class NodeConnector(Circle):
         Circle.__init__(self,parent,x,y,r,col)
         self.maingraph=maingraph
         self.evstack.append(evh(self))
-
+        self.inputs = []
+        self.outputs = []
+    def CanConnect(self):
+        return True
+    def GetNextNodes(self):
+        nodes = []
+        for output in self.outputs:
+            nodes.append(output.target)
+        return nodes
+    def GetPreviousNodes(self):
+        nodes = []
+        for input in self.inputs:
+            nodes.append(input.source)
+        return nodes
 class NodeConnection(GraphObject):
     """
     A connection between two connectors.

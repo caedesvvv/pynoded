@@ -9,6 +9,9 @@ import random
 
 colors = [(1,0,0),(0,1,0),(1,1,1),(1,0,1),(0,0,1)]
 
+INLETS = 1
+OUTLETS = 1
+
 class GraphNodeEvH(EvHandler):
     """
     Example graph node event handler.
@@ -59,7 +62,8 @@ class GraphNode(RectCollider,Graph):
         self.ninlets = 0
         RectCollider.__init__(self,w+2*self.inp_r,h)
         Graph.__init__(self,parent,x+self.inp_r,y)
-        self.objects[1]=[]
+        self.objects[INLETS]=[]
+        self.objects[OUTLETS]=[]
         self.objects[0].append(FancySquare(self,self.inp_r,0,w,h,col))
         self.objects[0].append(Label(self,self.inp_r,0,w,10,col=col,name=name))
         if not ninlets == None:
@@ -71,7 +75,20 @@ class GraphNode(RectCollider,Graph):
                 col_idx = random.randint(0,4)
                 self.AddOutlet(colors[col_idx])
         self.evstack.insert(0,evhandler(self))
-
+    def GetNextNodes(self):
+        nodes = []
+        for outlet in self.objects[OUTLETS]:
+            nodes += outlet.GetNextNodes()
+        return nodes
+    def GetPreviousNodes(self):
+        nodes = []
+        for inlet in self.objects[INLETS]:
+            nodes += inlet.GetPreviousNodes()
+        return nodes
+    def IsRootNode(self):
+        if len(self.GetPreviousNodes()):
+            return False
+        return True
     def AddInlet(self,col,con_type=NodeConnector):
         """
         Add an inlet to the node.
@@ -79,7 +96,7 @@ class GraphNode(RectCollider,Graph):
         @param con_type: class to create the connector from
         """
         i = self.ninlets
-        self.objects[1].append(con_type(self.parent,self,self.inp_r,(1+i)*self.stride,self.inp_r,col))
+        self.objects[INLETS].append(con_type(self.parent,self,self.inp_r,(1+i)*self.stride,self.inp_r,col))
         self.ninlets+=1
     def AddOutlet(self,col,con_type=NodeConnector):
         """
@@ -88,7 +105,7 @@ class GraphNode(RectCollider,Graph):
         @param con_type: class to create the connector from
         """
         i = self.noutlets
-        self.objects[1].append(con_type(self.parent,self,self.w-self.inp_r,(1+i)*self.stride,self.inp_r,col))
+        self.objects[OUTLETS].append(con_type(self.parent,self,self.w-self.inp_r,(1+i)*self.stride,self.inp_r,col))
         self.noutlets+=1
     def NewNode(self,x,y):
         """
