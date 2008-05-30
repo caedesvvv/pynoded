@@ -74,6 +74,12 @@ class GraphNode(RectCollider,Graph):
                 col_idx = random.randint(0,4)
                 self.AddOutlet(colors[col_idx])
         self.evstack.insert(0,evhandler(self))
+    def Destroy(self):
+        self.parent.objects[0].remove(self)
+        for inlet in self.objects[INLETS]:
+            inlet.ClearConnections()
+        for outlet in self.objects[OUTLETS]:
+            outlet.ClearConnections()
     def SetCol(self,name):
         self.objects[0][0].col = col
     def GetCol(self):

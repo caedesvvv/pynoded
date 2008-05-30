@@ -16,14 +16,17 @@ class ConnEvH(EvHandler):
         self.arrow=Arrow(self.maingraph,arr_x,arr_y,arr_x,arr_y,(0,0,0.7))
         self.maingraph.objects[1].append(self.arrow)
         self.maingraph.Redraw()
-
     def mousepress_left(self):
         x,y=self.maingraph.GetPointer()
         return (not self.maingraph.Test(*self.maingraph.FromLocal(x,y))) or self.maingraph.Propagate(x,y,"connect",self)
-        
+    def mousepress_right(self):
+        self.maingraph.evstack.remove(self)
+        self.maingraph.objects[1].remove(self.arrow)
+        return True
     def mouse_motion(self,x,y):
         self.arrow.x1,self.arrow.y1=self.maingraph.GetPointer()
         self.maingraph.Redraw()
+        return True
 
 class NodeConnectorEvH(EvHandler):
     """
@@ -56,14 +59,17 @@ class NodeConnector(Circle):
         self.evstack.append(evh(self))
         self.inputs = []
         self.outputs = []
+    def ClearConnections(self):
+        for input in list(self.inputs):
+            input.Destroy()
+        for output in list(self.outputs):
+            output.Destroy()
     def Connect(self,other,arrow=None):
         if not arrow:
             arrow=Arrow(self.maingraph,0,0,100,100,(0,0,0.7))
         newcon = NodeConnection(arrow,self,other)
         self.maingraph.objects[1].append(newcon) # add arrow to graph
-        self.outputs.append(newcon) # add connection to source
-        other.inputs.append(newcon) # add conection to target input
-    def CanConnect(self):
+    def CanConnect(self,other):
         return True
     def GetNextNodes(self):
         nodes = []
@@ -75,16 +81,30 @@ class NodeConnector(Circle):
         for input in self.inputs:
             nodes.append(input.source)
         return nodes
+
 class NodeConnection(GraphObject):
     """
     A connection between two connectors.
     """
     def __init__(self,arrow,source_c,target_c):
-        self.arrow=arrow
-        self.source=source_c.parent
-        self.source_c=source_c
-        self.target=target_c.parent
-        self.target_c=target_c
+        self.arrow = arrow
+        self.source = source_c.parent
+        self.source_c = source_c
+        self.target = target_c.parent
+        self.target_c = target_c
+        source_c.outputs.append(self) # add connection to source
+        target_c.inputs.append(self) # add conection to target input
+    def Destroy(self):
+        self.source_c.maingraph.objects[1].remove(self)
+        if self in self.source_c.outputs:
+            self.source_c.outputs.remove(self)
+        if self in self.target_c.inputs:
+            self.target_c.inputs.remove(self)
+        self.source = None
+        self.target = None
+        self.source_c = None
+        self.target_c = None
+        self.arrow = None
     def Draw(self,ctx):
         x0,y0=self.source.ToParent(self.arrow.parent,self.source_c.x,self.source_c.y)
         x1,y1=self.target.ToParent(self.arrow.parent,self.target_c.x,self.target_c.y)
