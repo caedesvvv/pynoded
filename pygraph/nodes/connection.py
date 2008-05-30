@@ -64,6 +64,9 @@ class NodeConnector(Circle):
             input.Destroy()
         for output in list(self.outputs):
             output.Destroy()
+    def HasConnections(self):
+        if self.inputs or self.outputs:
+            return True
     def Connect(self,other,arrow=None):
         if not arrow:
             arrow=Arrow(self.maingraph,0,0,100,100,(0,0,0.7))
