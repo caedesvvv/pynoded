@@ -10,7 +10,7 @@ import random
 colors = [(1,0,0),(0,1,0),(1,1,1),(1,0,1),(0,0,1)]
 
 INLETS = 1
-OUTLETS = 1
+OUTLETS = 2
 
 class GraphNodeEvH(EvHandler):
     """
@@ -57,7 +57,6 @@ class GraphNode(RectCollider,Graph):
         self.stride = h/5
         self.inputs = []
         self.outputs = []
-        self.name = name
         self.noutlets = 0
         self.ninlets = 0
         RectCollider.__init__(self,w+2*self.inp_r,h)
@@ -75,6 +74,17 @@ class GraphNode(RectCollider,Graph):
                 col_idx = random.randint(0,4)
                 self.AddOutlet(colors[col_idx])
         self.evstack.insert(0,evhandler(self))
+    def SetCol(self,name):
+        self.objects[0][0].col = col
+    def GetCol(self):
+        return self.objects[0][0].col
+    col = property(GetCol,SetCol)
+    def SetName(self,name):
+        self.objects[0][1].name = name
+    def GetName(self):
+        return self.objects[0][1].name
+    name = property(GetName,SetName)
+
     def GetNextNodes(self):
         nodes = []
         for outlet in self.objects[OUTLETS]:
@@ -98,6 +108,10 @@ class GraphNode(RectCollider,Graph):
         i = self.ninlets
         self.objects[INLETS].append(con_type(self.parent,self,self.inp_r,(1+i)*self.stride,self.inp_r,col))
         self.ninlets+=1
+    def GetInlet(self,idx):
+        return self.objects[INLETS][idx]
+    def GetOutlet(self,idx):
+        return self.objects[OUTLETS][idx]
     def AddOutlet(self,col,con_type=NodeConnector):
         """
         Add an outlet to the node.
