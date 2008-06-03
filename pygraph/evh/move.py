@@ -2,7 +2,7 @@
 Miscelaneus Event Handlers
 """
 
-from evhandler import EvHandler
+from base import EvHandler
 
 class MoveEvH(EvHandler):
     """

@@ -2,7 +2,7 @@
 Base graph objects
 """
 
-from evhandler import EvHandler,EvStack
+from evh.base import EvHandler,EvStack
 from math import *
 
 class Drawable(object):

@@ -4,7 +4,7 @@ Gtk Graph Backend
 from graph import *
 #from evhandler import *
 #from evhandlers import *
-from defaultevh import *
+from evh.graph import *
 from nodes import GraphNode
 import gtk
 import cairo
@@ -16,11 +16,11 @@ class GtkMainGraph(Graph):
       mg = GtkMainGraph()
       run(mg.widget, mg.evstack, "pygraph test")
     """
-    def __init__(self):
+    def __init__(self,evh=GraphEvH):
         self.widget=gtk.DrawingArea()
         self.parent=self
         Graph.__init__(self,None,0,0)
-        self.evstack.insert(0,DefaultEvH(self))
+        self.evstack.insert(0,evh(self))
         self.objects[1]=[]
         self.ctx = None
         self._prevw = 0
@@ -34,6 +34,7 @@ class GtkMainGraph(Graph):
 
     def Draw(self):
         # set the background
+        self.ctx.rectangle()
         self.ctx.set_source_rgb(0.7,0.7,0.7)
         self.ctx.set_operator (cairo.OPERATOR_SOURCE)
         self.ctx.paint()

@@ -3,9 +3,7 @@ OpenGL graph backend
 """
 
 from graph import *
-from evhandler import *
-from evhandlers import *
-from defaultevh import *
+from evh.graph import GraphEvH
 from nodes import GraphNode
 import cairo
 import Blender
@@ -18,10 +16,10 @@ except:
     pass
 
 class OpenglMainGraph(Graph):
-    def __init__(self):
+    def __init__(self,evh=GraphEvH):
         self.parent=self
         Graph.__init__(self,None,0,0)
-        self.evstack.insert(0,DefaultEvH(self))
+        self.evstack.insert(0,evh(self))
         self.objects[1]=[]
         self.Width = 0
         self.Height = 0

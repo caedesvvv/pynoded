@@ -1,7 +1,7 @@
 """
 Graph nodes
 """
-from pygraph.evhandlers import MoveEvH
+from pygraph.evh.move import MoveEvH
 from pygraph.graph import *
 from pygraph.shapes import Square,Label,FancySquare
 from pygraph.nodes.connection import NodeConnector

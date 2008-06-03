@@ -2,10 +2,9 @@
 Simple base event handlers.
 """
 
-from evhandler import *
-from evhandlers import *
+from base import *
 
-class DefaultEvH(EvHandler):
+class GraphEvH(EvHandler):
     """
     Example graph event handler.
     It can zoom with mouse and keyboard, create new nodes...
@@ -35,11 +34,11 @@ class DefaultEvH(EvHandler):
 
     def mousepress_right(self):
         x,y=self.maingraph.RawPointer
-        self.maingraph.evstack.append(ScrollEvH(self.maingraph,x,y))
+        self.maingraph.evstack.append(GraphScrollEvH(self.maingraph,x,y))
         return True
 
-    def mouse_motion(self,x,y):
-        return True
+    #def mouse_motion(self,x,y):
+    #    return False
 
     def expose(self):
         self.maingraph.CreateContext()
@@ -48,7 +47,7 @@ class DefaultEvH(EvHandler):
         self.maingraph.Blit()
         return True
 
-class ScrollEvH(EvHandler):
+class GraphScrollEvH(EvHandler):
     """
     Event handler for scrolling actions (happening between down and up).
     This event handler can handle moving of the main graph based on position.
