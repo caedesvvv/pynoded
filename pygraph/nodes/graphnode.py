@@ -80,7 +80,7 @@ class GraphNode(RectCollider,Graph):
             inlet.ClearConnections()
         for outlet in self.objects[OUTLETS]:
             outlet.ClearConnections()
-    def SetCol(self,name):
+    def SetCol(self,col):
         self.objects[0][0].col = col
     def GetCol(self):
         return self.objects[0][0].col
