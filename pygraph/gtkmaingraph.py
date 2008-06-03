@@ -34,7 +34,7 @@ class GtkMainGraph(Graph):
 
     def Draw(self):
         # set the background
-        self.ctx.rectangle()
+        #self.ctx.rectangle()
         self.ctx.set_source_rgb(0.7,0.7,0.7)
         self.ctx.set_operator (cairo.OPERATOR_SOURCE)
         self.ctx.paint()
