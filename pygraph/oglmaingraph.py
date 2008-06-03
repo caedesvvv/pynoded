@@ -12,8 +12,10 @@ import Blender
 import b2cs
 import OpenGL
 import OpenGL.GL
-
-import numpy
+try:
+    import numpy
+except:
+    pass
 
 class OpenglMainGraph(Graph):
     def __init__(self):
@@ -37,6 +39,8 @@ class OpenglMainGraph(Graph):
         self.Width = w
         self.Height = h
         self.CreateContext()
+        self.ctx.rectangle(0,0,w/2,h/2)
+        self.ctx.clip()
     def Draw(self):
         # set the background
         ctx = self.ctx
@@ -57,16 +61,26 @@ class OpenglMainGraph(Graph):
         surface = self.ctx.get_target()
         s_h = surface.get_height()
         s_w = surface.get_width()
-        a = numpy.frombuffer(surface.get_data(), numpy.uint8)
-        a.shape = (s_h,s_w, 4)
-        a = a[::-1,:,:]
+        try:
+             a = numpy.frombuffer(surface.get_data(), numpy.uint8)
+        except:
+             a = str(surface.get_data())
+        #a.shape = (s_h,s_w, 4)
+        #a = a[::-1,:,:]
         #s = a.tostring()
-        OpenGL.GL.glRasterPos2f(0.0,0.0)
+        try:
+            OpenGL.GL.glRasterPos2f(0.0,float(s_h)-2.0)
+            # 2 pixels offset sucks, but otherwise ogl doesnt draw at all...
+            # must investigate further into matter (XXX).
+        except:
+            return # sometimes opengl doesnt want to do this.. :P
+        OpenGL.GL.glPixelZoom(1.0,-1.0)
         OpenGL.GL.glDrawPixels (int(s_w),
                       int(s_h),
                       #Blender.BGL.GL_BGRA, Blender.BGL.GL_UNSIGNED_BYTE,
                       0x80E1, 0x1401,
                       a)
+        OpenGL.GL.glPixelZoom(1.0,1.0)
 
     def Zoom(self,x,y,factor):
         pre_x,pre_y = self.ToLocal(x,y)
@@ -87,8 +101,8 @@ class OpenglMainGraph(Graph):
         obj = GraphNode(self,*bb)
         self.AddNode(obj)
     def Redraw(self):
-        Blender.Window.QRedrawAll()
-
+        wID = Blender.Window.GetAreaID()
+        Blender.Window.QAdd(wID,Blender.Draw.REDRAW,0,1)
     def ToGlobal(self,x,y):
         return (x,y)
 
