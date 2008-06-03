@@ -11,10 +11,10 @@ class MoveEvH(EvHandler):
     def __init__(self,object,x,y):
         self.evstack=object.Root().evstack
         self.object=object
-	self.startx = x
-	self.starty = y
+        self.startx = x
+        self.starty = y
     def mouse_motion(self,x,y):
-	x,y = self.object.parent.GetPointer()
+        x,y = self.object.parent.GetPointer()
         if self.object.parent.Test(*self.object.parent.FromLocal(x,y)):
             self.object.x,self.object.y=x-self.startx,y-self.starty
             self.object.Redraw()
