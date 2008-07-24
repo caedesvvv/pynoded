@@ -133,7 +133,6 @@ class MainGraph(Graph):
         raise "Not implemented"
 
     def GetPointer(self):
-        print self.RawPointer
         return self.ToLocal(*self.RawPointer)
 
     def Root(self):
