@@ -47,6 +47,8 @@ class NodeConnectorEvH(EvHandler):
         connevh.maingraph.objects[1].remove(connevh.arrow)
         connevh.source_c.Connect(self.nodeconn,connevh.arrow)
         maingraph.Redraw()
+        connevh.source_c.Connected(self.nodeconn)
+        self.nodeconn.Connected(connevh.source)
         return True
 
 class NodeConnector(Circle):
@@ -72,6 +74,8 @@ class NodeConnector(Circle):
             arrow=Arrow(self.maingraph,0,0,100,100,(0,0,0.7))
         newcon = NodeConnection(arrow,self,other)
         self.maingraph.objects[1].append(newcon) # add arrow to graph
+    def Connected(self,other):
+        pass
     def CanConnect(self,other):
         return True
     def GetNextNodes(self):
