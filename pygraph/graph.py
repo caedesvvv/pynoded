@@ -72,7 +72,7 @@ class GraphObject(Drawable,Collider):
         Drawable.__init__(self,x,y,scale)
         self.evstack=EvStack()
     def GetPointer(self):
-        return self.ToLocal(*self.parent.GetPointer())
+        return self.ToLocal(*self.parent.GetRawPointer())
     def Redraw(self):
         self.parent.Redraw()
     def ToParent(self,obj,x,y):
@@ -106,6 +106,50 @@ class Graph(GraphObject):
             for o in reversed(prio):
                 if o.Test(x,y):
                     return o
+
+
+class MainGraph(Graph):
+    """
+    Base class for main graphs.
+    """
+    def __init__(self,*args):
+        Graph.__init__(self,*args)
+
+    def Zoom(self,x,y,factor):
+        pre_x,pre_y = self.ToLocal(x,y)
+        self.scale *=factor
+        post_x,post_y = self.ToLocal(x,y)
+        self.x,self.y = (self.x+post_x-pre_x,self.y+post_y-pre_y)
+        self.Redraw()
+
+    def AddNode(self,obj):
+        self.objects[0].append(obj)
+        self.Redraw()
+
+    def ToGlobal(self,x,y):
+        return (x,y)
+
+    def GetRawPointer(self):
+        raise "Not implemented"
+
+    def GetPointer(self):
+        print self.RawPointer
+        return self.ToLocal(*self.RawPointer)
+
+    def Root(self):
+        return self
+
+    def Test(self,x,y):
+        return True
+
+    def CenteredBB(self,x,y,size):
+        # not really needed, but useful in general..
+        obj_size = size
+        bb = [x-(obj_size/2),y-(obj_size/2),obj_size,obj_size]
+        return bb
+
+    RawPointer = property(GetRawPointer)
+    Pointer = property(GetPointer)
 
 class PropagateEvH(EvHandler):
     """

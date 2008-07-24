@@ -15,16 +15,14 @@ try:
 except:
     pass
 
-class OpenglMainGraph(Graph):
+class OpenglMainGraph(MainGraph):
     def __init__(self,evh=GraphEvH):
         self.parent=self
-        Graph.__init__(self,None,0,0)
+        MainGraph.__init__(self,None,0,0)
         self.evstack.insert(0,evh(self))
         self.objects[1]=[]
         self.Width = 0
         self.Height = 0
-    def GetPointer(self):
-        return self.ToLocal(*self.GetRawPointer())
 
     def GetRawPointer(self):
         point = b2cs.gui.get_corrected_mousepos(Blender.Window.GetAreaID())
@@ -39,6 +37,7 @@ class OpenglMainGraph(Graph):
         self.CreateContext()
         self.ctx.rectangle(0,0,w/2,h/2)
         self.ctx.clip()
+
     def Draw(self):
         # set the background
         ctx = self.ctx
@@ -80,34 +79,14 @@ class OpenglMainGraph(Graph):
                       a)
         OpenGL.GL.glPixelZoom(1.0,1.0)
 
-    def Zoom(self,x,y,factor):
-        pre_x,pre_y = self.ToLocal(x,y)
-        self.scale *=factor
-        post_x,post_y = self.ToLocal(x,y)
-        self.x,self.y = (self.x+post_x-pre_x,self.y+post_y-pre_y)
-        self.Redraw()
-    def AddNode(self,obj):
-        self.objects[0].append(obj)
-        self.Redraw()
-    def CenteredBB(self,x,y,size):
-        obj_size = size
-        bb = [x-(obj_size/2),y-(obj_size/2),obj_size,obj_size]
-        return bb
     def NewNode(self,x,y):
         obj_size = 30/self.scale
         bb = self.CenteredBB(x,y,obj_size)
         obj = GraphNode(self,*bb)
         self.AddNode(obj)
+
     def Redraw(self):
         wID = Blender.Window.GetAreaID()
         Blender.Window.QAdd(wID,Blender.Draw.REDRAW,0,1)
-    def ToGlobal(self,x,y):
-        return (x,y)
 
-    def Root(self):
-        return self
-    def Test(self,x,y):
-        return True
     RawPointer = property(GetRawPointer)
-    Pointer = property(GetPointer)
-

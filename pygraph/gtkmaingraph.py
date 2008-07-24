@@ -9,7 +9,7 @@ from nodes import GraphNode
 import gtk
 import cairo
 
-class GtkMainGraph(Graph):
+class GtkMainGraph(MainGraph):
     """
     MainGraph for gtk contexts
     Use as follows:
@@ -19,15 +19,12 @@ class GtkMainGraph(Graph):
     def __init__(self,evh=GraphEvH):
         self.widget=gtk.DrawingArea()
         self.parent=self
-        Graph.__init__(self,None,0,0)
+        MainGraph.__init__(self,None,0,0)
         self.evstack.insert(0,evh(self))
         self.objects[1]=[]
         self.ctx = None
         self._prevw = 0
         self._prevh = 0
-
-    def GetPointer(self):
-        return self.ToLocal(*self.widget.get_pointer())
 
     def GetRawPointer(self):
         return self.widget.get_pointer()
@@ -55,13 +52,6 @@ class GtkMainGraph(Graph):
         gc = gtk.gdk.GC(self.widget.window)
         self.widget.window.draw_drawable(gc, self.pixmap, 0,0, 0,0, -1,-1)
 
-    def Zoom(self,x,y,factor):
-        pre_x,pre_y = self.ToLocal(x,y)
-        self.scale *=factor
-        post_x,post_y = self.ToLocal(x,y)
-        self.x,self.y = (self.x+post_x-pre_x,self.y+post_y-pre_y)
-        self.Redraw()
- 
     def NewNode(self,x,y):
         obj_size = 30/self.scale
         self.objects[0].append(GraphNode(self,x-(obj_size/2),y-(obj_size/2),obj_size,obj_size))
@@ -70,19 +60,11 @@ class GtkMainGraph(Graph):
     def Redraw(self):
         self.widget.queue_draw()
 
-    def ToGlobal(self,x,y):
-        return (x,y)
-
-    def Root(self):
-        return self
-    def Test(self,x,y):
-        return True
     def GetWidth(self):
         return self.widget.allocation.width
     def GetHeight(self):
         return self.widget.allocation.height
+    RawPointer = property(GetRawPointer)
     Width = property(GetWidth)
     Height = property(GetHeight)
-    RawPointer = property(GetRawPointer)
-    Pointer = property(GetPointer)
 
