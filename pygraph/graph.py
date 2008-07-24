@@ -72,7 +72,7 @@ class GraphObject(Drawable,Collider):
         Drawable.__init__(self,x,y,scale)
         self.evstack=EvStack()
     def GetPointer(self):
-        return self.ToLocal(*self.parent.GetRawPointer())
+        return self.ToLocal(*self.parent.GetPointer())
     def Redraw(self):
         self.parent.Redraw()
     def ToParent(self,obj,x,y):
