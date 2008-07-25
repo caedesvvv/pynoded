@@ -66,6 +66,10 @@ class GraphScrollEvH(EvHandler):
         self.maingraph.Redraw()
         return True
 
+    def mousepress_right(self):
+        self.maingraph.evstack.remove(self)
+        return True
+
     def mouserelease_right(self):
         self.maingraph.evstack.remove(self)
         return True
