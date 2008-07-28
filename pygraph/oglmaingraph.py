@@ -20,7 +20,6 @@ class OpenglMainGraph(MainGraph):
         self.parent=self
         MainGraph.__init__(self,None,0,0)
         self.evstack.insert(0,evh(self))
-        self.objects[1]=[]
         self.Width = 0
         self.Height = 0
 

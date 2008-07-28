@@ -21,7 +21,6 @@ class GtkMainGraph(MainGraph):
         self.parent=self
         MainGraph.__init__(self,None,0,0)
         self.evstack.insert(0,evh(self))
-        self.objects[1]=[]
         self.ctx = None
         self._prevw = 0
         self._prevh = 0

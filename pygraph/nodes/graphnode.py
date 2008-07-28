@@ -59,12 +59,12 @@ class GraphNode(RectCollider,Graph):
         self.outputs = []
         self.noutlets = 0
         self.ninlets = 0
-        RectCollider.__init__(self,w+2*self.inp_r,h)
         Graph.__init__(self,parent,x+self.inp_r,y)
         self.objects[INLETS]=[]
         self.objects[OUTLETS]=[]
         self.objects[0].append(FancySquare(self,self.inp_r,0,w,h,col))
         self.objects[0].append(Label(self,self.inp_r,0,w,10,col=col,name=name))
+        RectCollider.__init__(self,w+2*self.inp_r,h)
         if not ninlets == None:
             for i in xrange(ninlets):
                 col_idx = random.randint(0,4)
@@ -85,6 +85,13 @@ class GraphNode(RectCollider,Graph):
     def GetCol(self):
         return self.objects[0][0].col
     col = property(GetCol,SetCol)
+    def SetHeight(self,h):
+        self.objects[0][0].h = h
+    def GetHeight(self):
+        return self.objects[0][0].h
+    h = property(GetHeight,SetHeight)
+    col = property(GetCol,SetCol)
+
     def SetName(self,name):
         self.objects[0][1].name = name
     def GetName(self):
@@ -101,6 +108,19 @@ class GraphNode(RectCollider,Graph):
         for inlet in self.objects[INLETS]:
             nodes += inlet.GetPreviousNodes()
         return nodes
+    def GetNextNodesWithConnections(self):
+        nodes = []
+        for outlet in self.objects[OUTLETS]:
+            for inlet,node in outlet.GetNextNodesWithConnections():
+                nodes.append([inlet,outlet,node])
+        return nodes
+    def GetPreviousNodesWithConnections(self):
+        nodes = []
+        for inlet in self.objects[INLETS]:
+            nodes += inlet.GetPreviousNodes()
+            for outlet,node in outlet.GetPreviousNodesWithConnections():
+                nodes.append([outlet,inlet,node])
+        return nodes
     def IsRootNode(self):
         if len(self.GetPreviousNodes()):
             return False
@@ -114,6 +134,13 @@ class GraphNode(RectCollider,Graph):
         i = self.ninlets
         self.objects[INLETS].append(con_type(self.parent,self,self.inp_r,(1+i)*self.stride,self.inp_r,col))
         self.ninlets+=1
+        return self.objects[INLETS][-1]
+    def GetOutlets(self):
+        for idx in xrange(self.noutlets):
+            yield self.GetOutlet(idx)
+    def GetInlets(self):
+        for idx in xrange(self.ninlets):
+            yield self.GetInlet(idx)
     def GetInlet(self,idx):
         return self.objects[INLETS][idx]
     def GetOutlet(self,idx):
@@ -127,6 +154,7 @@ class GraphNode(RectCollider,Graph):
         i = self.noutlets
         self.objects[OUTLETS].append(con_type(self.parent,self,self.w-self.inp_r,(1+i)*self.stride,self.inp_r,col))
         self.noutlets+=1
+        return self.objects[OUTLETS][-1]
     def NewNode(self,x,y):
         """
         Create a new node children of this one

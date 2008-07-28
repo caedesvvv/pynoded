@@ -88,6 +88,16 @@ class NodeConnector(Circle):
         for input in self.inputs:
             nodes.append(input.source)
         return nodes
+    def GetNextNodesWithConnections(self):
+        nodes = []
+        for output in self.outputs:
+            nodes.append([output.target_c,output.target])
+        return nodes
+    def GetPreviousNodesWithConnections(self):
+        nodes = []
+        for input in self.inputs:
+            nodes.append([input.source_c,input.source])
+        return nodes
 
 class NodeConnection(GraphObject):
     """

@@ -89,11 +89,14 @@ class Graph(GraphObject):
     """
     def __init__(self,parent,x,y,scale=1.0):
         GraphObject.__init__(self,parent,x,y,scale)
-        self.objects={0:[]}
         self.evstack.append(PropagateEvH(self))
+        self.Clear()
+
+    def Clear(self):
+        self.objects=[[],[],[],[]]
 
     def Draw_(self,ctx):
-        for prio in self.objects.values():
+        for prio in self.objects:
             for obj in prio:
                 obj.Draw(ctx)
 
@@ -102,7 +105,7 @@ class Graph(GraphObject):
         return o and getattr(o.evstack,event,False) and getattr(o.evstack,event)(*args)
 
     def ObjectAt(self,x,y):
-        for prio in reversed(self.objects.values()):
+        for prio in reversed(self.objects):
             for o in reversed(prio):
                 if o.Test(x,y):
                     return o
@@ -114,6 +117,11 @@ class MainGraph(Graph):
     """
     def __init__(self,*args):
         Graph.__init__(self,*args)
+        self.objects[1]=[]
+
+    def Clear(self):
+        Graph.Clear(self)
+        self.objects[1]=[]
 
     def Zoom(self,x,y,factor):
         pre_x,pre_y = self.ToLocal(x,y)
