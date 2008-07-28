@@ -29,7 +29,7 @@ class GraphEvH(EvHandler):
         return True
 
     def keypress_c(self):
-        self.maingraph.NewNode(*self.maingraph.RawPointer)
+        self.maingraph.NewNode(*self.maingraph.Pointer)
         return True
 
     def mousepress_right(self):
