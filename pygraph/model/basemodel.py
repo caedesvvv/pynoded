@@ -13,12 +13,19 @@ class SubscribableModel(object):
             self.uuid = uuid.UUID(instance_uuid)
         else:
             self.uuid = uuid.uuid1()
-    def new(self, clsname,*args):
-        return ClassRegistry[clsname](*args)
+    def copyfrom(self,other):
+        self._evhs = []
+        self._children = other._children
+        self.uuid = other.uuid
+        self.invalidate()
+    def new(self, clsname,*args,**kwargs):
+        return ClassRegistry[clsname](*args,**kwargs)
     def subscribe(self, evh):
-        self._evhs.append(evh)
+        if evh not in self._evhs:
+            self._evhs.append(evh)
     def unsubscribe(self, evh):
-        self._evhs.remove(evh)
+        if evh in self._evhs:
+            self._evhs.remove(evh)
     def post(self, name, *args):
         for evh in self._evhs:
             if hasattr(evh,name):
@@ -38,4 +45,6 @@ class SubscribableModel(object):
         self.post("delchild",child)
     def getChildren(self):
         return self._children
+    def invalidate(self):
+        self.post("invalidate")
 

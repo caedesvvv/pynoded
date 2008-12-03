@@ -2,6 +2,8 @@ import uuid
 import dMVC.model
 from meta import SubscribableModelMeta,ClassRegistry
 
+gdict = {}
+
 ########################################################
 # dmvc model
 class DMVCSubscribableModel(dMVC.model.Model):
@@ -15,8 +17,18 @@ class DMVCSubscribableModel(dMVC.model.Model):
             self.uuid = uuid.UUID(instance_uuid)
         else:
             self.uuid = uuid.uuid1()
-    def new(self, clsname, *args):
-        return ClassRegistry[clsname](*args)
+
+    def variablesToSerialize(self):
+        return ['_evhs']
+
+    def copyfrom(self, other):
+        self._evhs = []
+        self._children = other._children
+        self._props = other._props
+        self.uuid = other.uuid
+        self.invalidate()
+    def new(self, clsname, *args, **kwargs):
+        return ClassRegistry[clsname](*args, **kwargs)
     def setProperty(self,name,value):
         if self._props.get(name,None) == value:
             return
@@ -35,6 +47,11 @@ class DMVCSubscribableModel(dMVC.model.Model):
         self.triggerEvent("delchild",child=child)
     def getChildren(self):
         return self._children
+    @dMVC.model.localMethod
+    def doInvalidate(self,evt):
+        self.post("invalidate")
+    def invalidate(self):
+        self.triggerEvent("invalidate")
     # XXX TODO::: ------------------
     @dMVC.model.localMethod
     def getAddChild(self, evt):
@@ -51,6 +68,7 @@ class DMVCSubscribableModel(dMVC.model.Model):
     @dMVC.model.localMethod
     def subscribe(self, evh):
         self.subscribeEvent("addchild",self.getAddChild)
+        self.subscribeEvent("invalidate",self.doInvalidate)
         self.subscribeEvent("delchild",self.getDelChild)
         self.subscribeEvent("propertychange",self.getChangeProperty)
         self._evhs.append(evh)
