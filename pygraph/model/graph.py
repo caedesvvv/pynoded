@@ -1,10 +1,6 @@
-import uuid
-import dMVC.model
-from meta import SubscribableModelMeta,ClassRegistry
-
 # choose one of the following two
-#from basemodel import SubscribableModel
-from dmvcmodel import DMVCSubscribableModel as SubscribableModel
+from basemodel import SubscribableModel
+#from dmvcmodel import DMVCSubscribableModel as SubscribableModel
 
 ########################################################
 # graph interface
