@@ -1,7 +1,7 @@
 import uuid
 
 from meta import ClassRegistry
-from graph import SubscribableModel
+from basemodel import SubscribableModel
 
 def LoadModel(objs,reqclsname):
     retobj = []
