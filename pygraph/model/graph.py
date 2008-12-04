@@ -1,5 +1,5 @@
 # choose one of the following two
-from basemodel import SubscribableModel
+from metamodel.basemodel import SubscribableModel
 #from dmvcmodel import DMVCSubscribableModel as SubscribableModel
 
 ########################################################

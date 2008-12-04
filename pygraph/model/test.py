@@ -1,5 +1,5 @@
 from graph import GraphModel
-from yamlserializer import SaveModel,LoadModel
+from metamodel.yamlserializer import SaveModel,LoadModel
 
 if __name__ == "__main__":
     print "run test"
