@@ -1,10 +1,10 @@
 """
 Graph nodes
 """
-from pygraph.evh.move import MoveEvH
-from pygraph.graph import *
-from pygraph.shapes import Square,Label,FancySquare
-from pygraph.nodes.connection import NodeConnector
+from pynoded.evh.move import MoveEvH
+from pynoded.graph import *
+from pynoded.shapes import Square,Label,FancySquare
+from pynoded.nodes.connection import NodeConnector
 import random
 
 colors = [(1,0,0),(0,1,0),(1,1,1),(1,0,1),(0,0,1)]

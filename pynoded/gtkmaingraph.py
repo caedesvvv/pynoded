@@ -14,7 +14,7 @@ class GtkMainGraph(MainGraph):
     MainGraph for gtk contexts
     Use as follows:
       mg = GtkMainGraph()
-      run(mg.widget, mg.evstack, "pygraph test")
+      run(mg.widget, mg.evstack, "pynoded test")
     """
     def __init__(self,evh=GraphEvH):
         self.widget=gtk.DrawingArea()

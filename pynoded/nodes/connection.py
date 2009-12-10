@@ -1,8 +1,8 @@
 """
 Graph connections
 """
-from pygraph.graph import *
-from pygraph.shapes import Circle,Arrow
+from pynoded.graph import *
+from pynoded.shapes import Circle,Arrow
 
 class ConnEvH(EvHandler):
     """

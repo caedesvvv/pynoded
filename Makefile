@@ -3,7 +3,7 @@ prefix=/usr/local
 all:
 
 doc:
-	epydoc  --config docs/epydoc/pygraph.conf
+	epydoc  --config docs/epydoc/pynoded.conf
 
 install:
 	python setup.py install --prefix=$(prefix)

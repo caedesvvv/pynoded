@@ -2,7 +2,7 @@
 Circle shapes
 """
 
-from pygraph.graph import GraphObject,CircleCollider
+from pynoded.graph import GraphObject,CircleCollider
 import math
 
 class Circle(CircleCollider,GraphObject):

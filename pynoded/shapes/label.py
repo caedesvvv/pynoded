@@ -2,7 +2,7 @@
 Label shapes
 """
 
-from pygraph.graph import GraphObject,RectCollider
+from pynoded.graph import GraphObject,RectCollider
 from cairo import FONT_SLANT_NORMAL,FONT_WEIGHT_NORMAL
 
 class Label(RectCollider,GraphObject):

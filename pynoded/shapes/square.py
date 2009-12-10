@@ -2,7 +2,7 @@
 Square shapes
 """
 
-from pygraph.graph import GraphObject,RectCollider
+from pynoded.graph import GraphObject,RectCollider
 
 class Square(RectCollider,GraphObject):
     """

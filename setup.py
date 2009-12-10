@@ -8,7 +8,7 @@ except ImportError:
 import os
 
 #coz setuptools on linux can't figure it out
-bi = "pygraph"
+bi = "pynoded"
 wdirs = []
 
 for root, dirs, files in os.walk(bi):
@@ -19,9 +19,9 @@ for root, dirs, files in os.walk(bi):
             dirs.remove('.svn')
 
 setup(
-    name = "pygraph",
+    name = "pynoded",
     version = "0.1",
-    packages = ['pygraph'] + wdirs,
+    packages = ['pynoded'] + wdirs,
     package_data = {
         # If any package contains *.txt or *.rst files, include them:
         '': ['*.txt', '*.xml','hellow.py'],

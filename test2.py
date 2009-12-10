@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 
-from pygraph.gtkmaingraph import *
+from pynoded.gtkmaingraph import *
 import gtk
 
 def run(widget,evh,title="test app"):
@@ -65,4 +65,4 @@ def run(widget,evh,title="test app"):
     gtk.main()
 
 mg=GtkMainGraph()
-run(mg.widget,mg.evstack,"pygraph test")
+run(mg.widget,mg.evstack,"pynoded test")

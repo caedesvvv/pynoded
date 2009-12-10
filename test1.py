@@ -6,7 +6,7 @@ from math import pi,atan2
 import cairo
 import gtk
 
-from pygraph.shapes import GraphNode
+from pynoded.shapes import GraphNode
 
 class CairoGraph(object):
     def __init__(self):
@@ -166,4 +166,4 @@ def run(Widget,title="test app"):
     window.present()
     gtk.main()
 
-run(GtkBackend,"pygraph test")
+run(GtkBackend,"pynoded test")

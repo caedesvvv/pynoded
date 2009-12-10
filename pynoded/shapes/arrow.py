@@ -2,7 +2,7 @@
 Arrow shapes
 """
 
-from pygraph.graph import GraphObject
+from pynoded.graph import GraphObject
 from math import atan2,pi
 from cubicspline import cubicspline
 from numpy import array
